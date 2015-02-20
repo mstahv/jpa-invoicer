@@ -1,71 +1,50 @@
 package org.example.backend.service;
 
+import com.mysema.query.types.expr.BooleanExpression;
 import java.util.List;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import org.example.backend.AbstractFacade;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import org.example.backend.Contact;
 import org.example.backend.Invoicer;
+import org.example.backend.QContact;
+import org.springframework.data.domain.PageRequest;
 
 /**
  *
  * @author Matti Tahvonen
  */
 @Stateless
-public class ContactFacade extends AbstractFacade<Contact> {
+public class ContactFacade {
 
-    @PersistenceContext(unitName = "invoicerdb")
-    private EntityManager em;
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
-    }
-
-    public List<Contact> findAll(Invoicer invoicer) {
-        return em.createQuery(
-                "SELECT c FROM Contact c WHERE c.invoicer = :invoicer").
-                setParameter("invoicer", invoicer).getResultList();
-    }
+    @Inject
+    ContactRepository repository;
 
     public List<Contact> findPaged(Invoicer invoicer, String filter,
             int firstResult,
             int maxResults) {
-        return em.createQuery(
-                "SELECT c FROM Contact c WHERE c.invoicer = :invoicer "
-                + "AND LOWER(c.name) LIKE :f")
-                .setParameter("invoicer", invoicer)
-                .setParameter("f", "" + filter.toLowerCase() + "%")
-                .setFirstResult(firstResult)
-                .setMaxResults(maxResults)
-                .getResultList();
+        return repository.findAll(filterByNamePredicate(filter, invoicer),
+                new PageRequest(firstResult / maxResults, maxResults)
+        ).getContent();
+    }
+
+    protected static BooleanExpression filterByNamePredicate(String filter,
+            Invoicer invoicer) {
+        return QContact.contact.name.startsWithIgnoreCase(filter)
+                .and(QContact.contact.invoicer.eq(invoicer));
     }
 
     public Integer countContacts(Invoicer invoicer, String filter) {
-        return ((Long) em.createQuery(
-                "SELECT COUNT (c) FROM Contact c WHERE c.invoicer = :invoicer "
-                + "AND LOWER(c.name) LIKE :f")
-                .setParameter("invoicer", invoicer)
-                .setParameter("f", "" + filter.toLowerCase() + "%")
-                .getSingleResult()).intValue();
+        return (int) repository.findAll(filterByNamePredicate(filter, invoicer),
+                new PageRequest(1, 1)).getTotalElements();
     }
 
-    public ContactFacade() {
-        super(Contact.class);
+    public Contact save(Contact entity) {
+        return repository.save(entity);
     }
 
-    public Contact findByEmail(String email) {
-        final CriteriaBuilder cb = getEntityManager().
-                getCriteriaBuilder();
-        javax.persistence.criteria.CriteriaQuery cq = cb.createQuery();
-        Root r = cq.from(Contact.class);
-        CriteriaQuery<Contact> q = cq.select(r).where(cb.equal(r.get("email"),
-                email));
-        return em.createQuery(q).getSingleResult();
+    public Contact findOne(Integer id) {
+        return repository.findOne(id);
     }
 
 }

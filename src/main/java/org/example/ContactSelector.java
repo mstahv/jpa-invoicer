@@ -72,7 +72,7 @@ public class ContactSelector extends LazyComboBox<Contact> implements
         contact.setInvoicer(invoicerSelect.getValue());
         form.setEntity(contact);
         form.setSavedHandler(entity -> {
-            contactFacade.create(entity);
+            contactFacade.save(entity);
             form.getPopup().close();
             updatelist();
             setValue(entity);
@@ -84,9 +84,9 @@ public class ContactSelector extends LazyComboBox<Contact> implements
     }
 
     private void editSelected() {
-        form.setEntity(contactFacade.find(getValue().getId()));
+        form.setEntity(contactFacade.findOne(getValue().getId()));
         form.setSavedHandler(entity -> {
-            contactFacade.edit(entity);
+            contactFacade.save(entity);
             form.getPopup().close();
             updatelist();
             setValue(entity);
@@ -97,9 +97,10 @@ public class ContactSelector extends LazyComboBox<Contact> implements
         form.openInModalPopup().setCaption("Edit customer");
 
     }
-
+    
     @Override
     protected void setCompositionRoot(Component compositionRoot) {
+        // Add an edit button next to the combobox
         super.setCompositionRoot(new MHorizontalLayout(compositionRoot, edit));
     }
 
