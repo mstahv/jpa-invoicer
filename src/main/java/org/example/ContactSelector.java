@@ -72,7 +72,7 @@ public class ContactSelector extends LazyComboBox<Contact> implements
         contact.setInvoicer(invoicerSelect.getValue());
         form.setEntity(contact);
         form.setSavedHandler(entity -> {
-            contactFacade.create(entity);
+            contactFacade.save(entity);
             form.getPopup().close();
             updatelist();
             setValue(entity);
@@ -84,9 +84,9 @@ public class ContactSelector extends LazyComboBox<Contact> implements
     }
 
     private void editSelected() {
-        form.setEntity(contactFacade.find(getValue().getId()));
+        form.setEntity(contactFacade.findBy(getValue().getId()));
         form.setSavedHandler(entity -> {
-            contactFacade.edit(entity);
+            contactFacade.save(entity);
             form.getPopup().close();
             updatelist();
             setValue(entity);

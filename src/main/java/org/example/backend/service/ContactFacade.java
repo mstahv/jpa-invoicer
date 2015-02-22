@@ -1,71 +1,78 @@
 package org.example.backend.service;
 
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.expr.BooleanExpression;
 import java.util.List;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import org.example.backend.AbstractFacade;
 import org.example.backend.Contact;
+import org.example.backend.Contact_;
 import org.example.backend.Invoicer;
+import org.example.backend.QContact;
 
 /**
  *
  * @author Matti Tahvonen
  */
 @Stateless
-public class ContactFacade extends AbstractFacade<Contact> {
+public class ContactFacade {
 
     @PersistenceContext(unitName = "invoicerdb")
-    private EntityManager em;
+    public EntityManager em;
 
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
-    }
+    @Inject
+    ContactRepository repository;
 
     public List<Contact> findAll(Invoicer invoicer) {
-        return em.createQuery(
-                "SELECT c FROM Contact c WHERE c.invoicer = :invoicer").
-                setParameter("invoicer", invoicer).getResultList();
+        return repository.findByInvoicer(invoicer);
+    }
+
+    protected static BooleanExpression filterByNamePredicate(String filter,
+            Invoicer invoicer) {
+        return QContact.contact.name.startsWithIgnoreCase(filter)
+                .and(QContact.contact.invoicer.eq(invoicer));
     }
 
     public List<Contact> findPaged(Invoicer invoicer, String filter,
             int firstResult,
             int maxResults) {
-        return em.createQuery(
-                "SELECT c FROM Contact c WHERE c.invoicer = :invoicer "
-                + "AND LOWER(c.name) LIKE :f")
-                .setParameter("invoicer", invoicer)
-                .setParameter("f", "" + filter.toLowerCase() + "%")
-                .setFirstResult(firstResult)
-                .setMaxResults(maxResults)
-                .getResultList();
+
+        QContact c = QContact.contact;
+
+        return new JPAQuery(em).from(c).where(c.invoicer.eq(invoicer).and(
+                c.name.startsWithIgnoreCase(filter))).offset(firstResult)
+                .limit(maxResults).list(c);
+
+//        Contact contact = new Contact();
+//        contact.setInvoicer(invoicer);
+//        contact.setName(filter);
+//        return repository.findByLike(contact, firstResult, maxResults,
+//                Contact_.invoicer, Contact_.name);
+    }
+
+    public Contact findBy(Integer id) {
+        return repository.findBy(id);
     }
 
     public Integer countContacts(Invoicer invoicer, String filter) {
-        return ((Long) em.createQuery(
-                "SELECT COUNT (c) FROM Contact c WHERE c.invoicer = :invoicer "
-                + "AND LOWER(c.name) LIKE :f")
-                .setParameter("invoicer", invoicer)
-                .setParameter("f", "" + filter.toLowerCase() + "%")
-                .getSingleResult()).intValue();
-    }
-
-    public ContactFacade() {
-        super(Contact.class);
+        QContact c = QContact.contact;
+         return (int) new JPAQuery(em).from(c).where(c.invoicer.eq(invoicer).and(
+                c.name.startsWithIgnoreCase(filter))).count();
+//        final Contact contact = new Contact();
+//        contact.setInvoicer(invoicer);
+//        contact.setName(filter);
+//        return repository.countLike(contact, Contact_.invoicer, Contact_.name).
+//                intValue();
     }
 
     public Contact findByEmail(String email) {
-        final CriteriaBuilder cb = getEntityManager().
-                getCriteriaBuilder();
-        javax.persistence.criteria.CriteriaQuery cq = cb.createQuery();
-        Root r = cq.from(Contact.class);
-        CriteriaQuery<Contact> q = cq.select(r).where(cb.equal(r.get("email"),
-                email));
-        return em.createQuery(q).getSingleResult();
+        return repository.findByEmail(email);
+    }
+
+    public Contact save(Contact entity) {
+        return repository.save(entity);
     }
 
 }
