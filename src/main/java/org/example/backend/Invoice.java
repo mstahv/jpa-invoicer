@@ -65,7 +65,7 @@ public class Invoice extends AbstractEntity {
     public void setLastEdited(Date lastEdited) {
         this.lastEdited = lastEdited;
     }
-    
+
     public Integer getInvoiceNumber() {
         return invoiceNumber;
     }
@@ -84,8 +84,12 @@ public class Invoice extends AbstractEntity {
 
     @Transient
     public Double getTotal() {
-        return getInvoiceRows().stream().map(r -> r.getAmount() * r.getPrice()).
-                reduce(Double::sum).get();
+        double sum = 0;
+        List<InvoiceRow> invoiceRows1 = getInvoiceRows();
+        for (InvoiceRow r : invoiceRows1) {
+            sum += r.getAmount() * r.getPrice();
+        }
+        return sum;
     }
 
     @Transient
@@ -100,9 +104,9 @@ public class Invoice extends AbstractEntity {
             checksum += d * multipliers[counter % multipliers.length];
             counter++;
         }
-        checksum = checksum%10;
+        checksum = checksum % 10;
         checksum = 10 - checksum;
-        checksum = checksum%10;
+        checksum = checksum % 10;
         String ref = "" + getInvoiceNumber() + checksum;
         return ref;
     }
