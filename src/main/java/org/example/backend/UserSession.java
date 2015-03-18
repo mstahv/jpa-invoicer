@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.deltaspike.core.api.config.ConfigResolver;
 import org.example.backend.service.UserFacade;
 
@@ -21,8 +22,9 @@ public class UserSession implements Serializable {
     
     @PostConstruct
     public void init() {
+        final String propertyValue = ConfigResolver.getPropertyValue("jpa-invoicer.gpluskey");
         // If no Google OAuth API key available, use fake login
-        if(ConfigResolver.getPropertyValue("jpa-invoicer.gpluskey") == null) {
+        if(StringUtils.isEmpty(propertyValue)) {
             login("matti.meikalainen@gmail.com", "Matti Meikäläinen");
         }
     }
