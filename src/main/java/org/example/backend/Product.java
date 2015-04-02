@@ -19,24 +19,10 @@ import javax.validation.constraints.Size;
  */
 
 @Entity
-public class Product implements Serializable {
+public class Product extends AbstractEntity {
 
-    @Id
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "Id")
-    private Integer id;
     @Size(max = 250)
-    @Column(name = "Name")
     private String name;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

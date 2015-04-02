@@ -8,6 +8,7 @@ package org.example.backend.service;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import org.example.backend.AbstractFacade;
 import org.example.backend.Product;
 
 /**

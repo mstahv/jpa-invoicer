@@ -20,9 +20,7 @@ import org.vaadin.viritin.layouts.MHorizontalLayout;
  *
  * @author Mortoza Khan
  */
-
-
-@CDIView("product")
+@CDIView
 public class ProductView extends MVerticalLayout implements View {
 
     @Inject
@@ -84,18 +82,15 @@ public class ProductView extends MVerticalLayout implements View {
     }
 
  private void addTableButtons(){
-        newButton = new Button("New", new Button.ClickListener() {
-            public void buttonClick(Button.ClickEvent event) {
-                try {
-                    form.setEntity(new Product());
-                } catch (Exception e) {
-                    return;
-                }
+        newButton = new Button("New", event -> {
+            try {
+                form.setEntity(new Product());
+            } catch (Exception e) {
+                return;
             }
         });  
         
-        delButton = new Button("Delete", new Button.ClickListener() {
-        public void buttonClick(Button.ClickEvent event) {
+        delButton = new Button("Delete", event -> {
             try {
                 facade1.remove(table.getValue());
                 table.setBeans(facade1.findAll());
@@ -103,13 +98,12 @@ public class ProductView extends MVerticalLayout implements View {
             } catch (Exception e) {
                 return;
             }
-        }
         });  
     }
 
    
     public void save(Product entity) {
-        if (form.getEntity() == null) {
+        if (form.getEntity().getId() == null) {
             facade1.create(entity);
         } else {
             facade1.edit(entity);
