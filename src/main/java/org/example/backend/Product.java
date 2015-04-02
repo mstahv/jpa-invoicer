@@ -14,14 +14,14 @@ import javax.validation.constraints.Size;
 public class Product extends AbstractEntity {
     
     public enum State {
-        Active, New, Archived
+        Active, Archived
     }
 
     @Size(max = 250)
     private String description;
     
     @NotNull
-    private State productState = State.New;
+    private State productState = State.Active;
     
     private Double price = 0.0;
     

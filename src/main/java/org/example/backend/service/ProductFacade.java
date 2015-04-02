@@ -10,6 +10,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import org.example.backend.Invoicer;
 import org.example.backend.Product;
+import org.example.backend.Product.State;
 
 /**
  *
@@ -26,6 +27,10 @@ public class ProductFacade {
 
     public List<Product> findByInvoicer(Invoicer value) {
         return repo.findByInvoicer(value);
+    }
+
+    public  List<Product> findActiveByInvoicer(Invoicer invoicer) {
+        return repo.findByInvoicerAndProductState(invoicer, State.Active);
     }
        
 }

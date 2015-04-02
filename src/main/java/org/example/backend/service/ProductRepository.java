@@ -15,4 +15,7 @@ public interface ProductRepository extends EntityRepository<Product, Long> {
 
     public QueryResult findByInvoicerAndNameLikeIgnoreCase(Invoicer invoicer,
             String string);
+
+    public List<Product> findByInvoicerAndProductState(Invoicer invoicer,
+            Product.State state);
 }

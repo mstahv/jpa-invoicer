@@ -14,12 +14,8 @@ import org.example.backend.Invoice;
 import org.example.backend.InvoiceRow;
 import org.example.backend.Product;
 import org.example.backend.service.ProductFacade;
-import org.vaadin.viritin.fields.AbstractElementCollection;
 import org.vaadin.viritin.fields.ElementCollectionField;
-import org.vaadin.viritin.fields.LazyComboBox;
 import org.vaadin.viritin.fields.MTextField;
-import org.vaadin.viritin.fields.MValueChangeEvent;
-import org.vaadin.viritin.fields.MValueChangeListener;
 import org.vaadin.viritin.fields.TypedSelect;
 import org.vaadin.viritin.form.AbstractForm;
 import org.vaadin.viritin.label.Header;
@@ -44,7 +40,9 @@ public class InvoiceForm extends AbstractForm<Invoice> {
     public static final class RowEditorModel {
         
         TypedSelect<Product> product = new TypedSelect<>(Product.class)
-                .withSelectType(ComboBox.class).withWidth("150px");
+                .withSelectType(ComboBox.class)
+                .withWidth("150px")
+                .setInputPrompt("Load from...");
         MTextField description = new MTextField().withFullWidth();
         MTextField amount = new MTextField().withWidth("3em");
         MTextField unit = new MTextField().withWidth("3em");
@@ -56,14 +54,17 @@ public class InvoiceForm extends AbstractForm<Invoice> {
             .withEditorInstantiator(() -> {
                 RowEditorModel r = new RowEditorModel();
                 r.product.setOptions(
-                        productFacade.findByInvoicer(getEntity().getInvoicer()));
+                        productFacade.findActiveByInvoicer(getEntity().getInvoicer()));
                 r.product.addMValueChangeListener(event -> {
-                    // Copy "default values" from Product to row
-                    r.description.setValue(event.getValue().getDescription());
-                    r.price.setValue(event.getValue().getPrice().toString());
-                    r.unit.setValue(event.getValue().getUnit());
-                    
-                    r.description.focus();
+                    if(event.getValue() != null) {
+                        // Copy "default values" from Product to row
+                        r.description.setValue(event.getValue().getDescription());
+                        r.price.setValue(event.getValue().getPrice().toString());
+                        r.unit.setValue(event.getValue().getUnit());
+
+                        r.amount.focus();
+                        r.product.setValue(null);
+                    }
                 });
                 return r;
     });

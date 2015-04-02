@@ -39,7 +39,7 @@ public class ProductView extends MVerticalLayout implements View {
     });
 
     MTable<Product> table = new MTable<>(Product.class)
-            .withProperties("description");
+            .withProperties("description", "price", "unit", "productState");
 
     @PostConstruct
     public void initComponent() {
@@ -61,7 +61,7 @@ public class ProductView extends MVerticalLayout implements View {
 
         addComponents(new Header("Product listing"),
                 new MHorizontalLayout(invoicerSelect, newButton)
-                        .alignAll(Alignment.MIDDLE_LEFT),
+                .alignAll(Alignment.MIDDLE_LEFT),
                 table
         );
     }
