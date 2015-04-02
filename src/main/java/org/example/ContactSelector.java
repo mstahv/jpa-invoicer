@@ -81,6 +81,7 @@ public class ContactSelector extends LazyComboBox<Contact> implements
             form.getPopup().close();
         });
         form.openInModalPopup().setCaption("Add new customer");
+        form.getSaveButton().setEnabled(true); // new item
     }
 
     private void editSelected() {

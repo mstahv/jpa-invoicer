@@ -3,17 +3,17 @@ package org.example;
 import com.vaadin.cdi.CDIView;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Notification;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.HorizontalLayout;
 import org.example.backend.Product;
 import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.label.Header;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 import org.example.backend.service.ProductFacade;
+import org.vaadin.viritin.button.PrimaryButton;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 /**
@@ -24,31 +24,28 @@ import org.vaadin.viritin.layouts.MHorizontalLayout;
 public class ProductView extends MVerticalLayout implements View {
 
     @Inject
-    ProductFacade facade1;
+    ProductFacade facade;
     @Inject
     ProductForm form;
 
-    Button newButton;
-    Button delButton;
-   
-    MTable<Product> table = new MTable<>(Product.class);    //.withProperties("id","name");
+    @Inject
+    InvoicerSelect invoicerSelect;
 
-    //Panel for Form
-    Panel panel = new Panel("Product");
-  
-    HorizontalLayout buttons1;
-    MHorizontalLayout horizontal;
-    
+    Button newButton = new PrimaryButton("New", e -> {
+        Product p = new Product();
+        p.setInvoicer(invoicerSelect.getValue());
+        form.setEntity(p);
+        form.openInModalPopup();
+    });
+
+    MTable<Product> table = new MTable<>(Product.class)
+            .withProperties("description");
+
     @PostConstruct
     public void initComponent() {
-        //buttons
-        buttons1 = new HorizontalLayout();
-        horizontal=new MHorizontalLayout();
-        
-        addTableButtons();
-        buttons1.addComponent(newButton);
-        buttons1.addComponent(delButton);
-        
+
+        invoicerSelect.addMValueChangeListener(e -> listEntities());
+
         form.setResetHandler(this::reset);
         form.setSavedHandler(this::save);
 
@@ -57,58 +54,25 @@ public class ProductView extends MVerticalLayout implements View {
         table.setColumnCollapsingAllowed(true);
         table.addMValueChangeListener(e -> {
             form.setEntity(e.getValue());
+            form.openInModalPopup();
         });
 
-        //panel.addStyleName("mypanelexample");
-        panel.setSizeUndefined();
-
-        // Create the content
-        //form.addStyleName("mypanelcontent");
-        form.setSizeUndefined();
-        panel.setContent(form);
-
         listEntities();
-        
-        horizontal.addComponent(table);
-        horizontal.addComponent(panel);
+
         addComponents(new Header("Product listing"),
-                buttons1,                
-                horizontal
+                new MHorizontalLayout(invoicerSelect, newButton)
+                        .alignAll(Alignment.MIDDLE_LEFT),
+                table
         );
     }
 
     private void listEntities() {
-        table.setBeans(facade1.findAll());
+        table.setBeans(facade.findByInvoicer(invoicerSelect.getValue()));
     }
 
- private void addTableButtons(){
-        newButton = new Button("New", event -> {
-            try {
-                form.setEntity(new Product());
-            } catch (Exception e) {
-                return;
-            }
-        });  
-        
-        delButton = new Button("Delete", event -> {
-            try {
-                facade1.remove(table.getValue());
-                table.setBeans(facade1.findAll());
-                Notification.show("Deleted...");
-            } catch (Exception e) {
-                return;
-            }
-        });  
-    }
-
-   
     public void save(Product entity) {
-        if (form.getEntity().getId() == null) {
-            facade1.create(entity);
-        } else {
-            facade1.edit(entity);
-        }
-        form.setEntity(null);        
+        facade.save(entity);
+        form.getPopup().close();
         listEntities();
         Notification.show("Saved!");
     }
@@ -116,6 +80,7 @@ public class ProductView extends MVerticalLayout implements View {
     public void reset(Product entity) {
         // just hide the form
         form.setEntity(null);
+        form.getPopup().close();
         listEntities();
     }
 

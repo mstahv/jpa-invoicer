@@ -1,15 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.example.backend;
 
-import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -20,16 +12,67 @@ import javax.validation.constraints.Size;
 
 @Entity
 public class Product extends AbstractEntity {
-
-    @Size(max = 250)
-    private String name;
-
-    public String getName() {
-        return name;
+    
+    public enum State {
+        Active, New, Archived
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @Size(max = 250)
+    private String description;
+    
+    @NotNull
+    private State productState = State.New;
+    
+    private Double price = 0.0;
+    
+    private String unit = "h";
+    
+    @ManyToOne
+    private Invoicer invoicer;
+
+    public State getProductState() {
+        return productState;
+    }
+
+    public void setProductState(State productState) {
+        this.productState = productState;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double defaultPrice) {
+        this.price = defaultPrice;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String defaultUnit) {
+        this.unit = defaultUnit;
+    }
+
+    public Invoicer getInvoicer() {
+        return invoicer;
+    }
+
+    public void setInvoicer(Invoicer invoicer) {
+        this.invoicer = invoicer;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String name) {
+        this.description = name;
+    }
+
+    @Override
+    public String toString() {
+        return description;
     }
     
 }   

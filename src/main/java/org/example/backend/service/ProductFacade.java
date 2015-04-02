@@ -5,10 +5,10 @@
  */
 package org.example.backend.service;
 
+import java.util.List;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import org.example.backend.AbstractFacade;
+import javax.inject.Inject;
+import org.example.backend.Invoicer;
 import org.example.backend.Product;
 
 /**
@@ -16,18 +16,16 @@ import org.example.backend.Product;
  * @author Mortoza Khan
  */
 @Stateless
-public class ProductFacade extends AbstractFacade<Product> {
-    @PersistenceContext(unitName = "invoicerdb")
-    private EntityManager em;
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
-    }
-
-    public ProductFacade() {
-        super(Product.class);
-    }
+public class ProductFacade {
     
-   
+    @Inject ProductRepository repo;
+
+    public void save(Product entity) {
+        repo.save(entity);
+    }
+
+    public List<Product> findByInvoicer(Invoicer value) {
+        return repo.findByInvoicer(value);
+    }
+       
 }

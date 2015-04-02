@@ -1,7 +1,5 @@
 package org.example.backend.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -9,8 +7,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import org.example.backend.AbstractFacade;
-import org.example.backend.Contact;
-import org.example.backend.Invoicer;
 import org.example.backend.User;
 
 /**
@@ -43,10 +39,6 @@ public class UserFacade extends AbstractFacade<User> {
         } catch(Exception e) {
             return null;
         }
-    }
-
-    public List<Invoicer> getInvoicers(User user) {
-        return new ArrayList(em.merge(user).getAdministrates());
     }
 
 }

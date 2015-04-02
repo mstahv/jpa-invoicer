@@ -17,6 +17,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({})
 @XmlRootElement
 public class Invoicer extends AbstractEntity {
+    
+    @OneToMany(mappedBy = "invoicer", fetch = FetchType.LAZY)
+    private List<Product> products = new ArrayList<>();
 
     @NotNull(message = "Name is required")
     @Size(min = 3, max = 40, message = "name must be longer than 3 and less than 40 characters")
@@ -108,6 +111,14 @@ public class Invoicer extends AbstractEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 
     @Override

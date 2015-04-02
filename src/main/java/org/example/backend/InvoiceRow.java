@@ -2,6 +2,7 @@ package org.example.backend;
 
 import java.io.Serializable;
 import javax.persistence.Embeddable;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -11,6 +12,9 @@ import javax.validation.constraints.NotNull;
  */
 @Embeddable
 public class InvoiceRow implements Serializable {
+    
+    @ManyToOne
+    private Product product;
 
     @NotNull
     private String description;
@@ -25,6 +29,14 @@ public class InvoiceRow implements Serializable {
     @Min(0)
     @NotNull
     private Double price = 1.0;
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
     public String getUnit() {
         return unit;

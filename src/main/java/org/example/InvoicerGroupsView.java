@@ -69,10 +69,10 @@ public class InvoicerGroupsView extends MVerticalLayout implements View {
     public void save(Invoicer entity) {
         try {
             if (entity.getId() == null) {
-                cf.create(entity);
+                cf.save(entity);
                 session.getUser().getAdministrates().add(entity);
             } else {
-                cf.edit(entity);
+                cf.save(entity);
             }
             Notification.show("Saved!");
         } catch (Exception e) {

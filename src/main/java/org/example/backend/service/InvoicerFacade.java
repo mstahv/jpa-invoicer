@@ -23,54 +23,32 @@ import org.example.backend.User;
  * @author Matti Tahvonen
  */
 @Stateless
-public class InvoicerFacade extends AbstractFacade<Invoicer> {
+public class InvoicerFacade {
 
-    @PersistenceContext(unitName = "invoicerdb")
-    private EntityManager em;
+    @Inject
+    InvoicerRepository repository;
 
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
-    }
+    @Inject
+    UserRepository userRepository;
 
-    public InvoicerFacade() {
-        super(Invoicer.class);
-    }
-
-    @Override
-    public void create(Invoicer entity) {
+    public void save(Invoicer entity) {
         for (int i = 0; i < entity.getAdministrators().size(); i++) {
             User usr = entity.getAdministrators().get(i);
             User existing = userFacade.findByEmail(usr.getEmail());
             if (existing != null) {
                 entity.getAdministrators().remove(usr);
-                entity.getAdministrators().add(i, em.find(User.class, existing.
+                entity.getAdministrators().add(i, userRepository.findBy(existing.
                         getId()));
             } else {
-                em.persist(usr);
+                userRepository.save(usr);
             }
         }
-        super.create(entity);
+        repository.save(entity);
     }
 
     @Inject
     UserFacade userFacade;
 
-    @Override
-    public void edit(Invoicer entity) {
-        for (int i = 0; i < entity.getAdministrators().size(); i++) {
-            User usr = entity.getAdministrators().get(i);
-            User existing = userFacade.findByEmail(usr.getEmail());
-            if (existing != null) {
-                entity.getAdministrators().remove(usr);
-                entity.getAdministrators().add(i, em.find(User.class, existing.
-                        getId()));
-            } else {
-                em.persist(usr);
-            }
-        }
-        super.edit(entity);
-    }
     private JAXBContext jaxbContext;
 
     @PostConstruct
@@ -85,7 +63,7 @@ public class InvoicerFacade extends AbstractFacade<Invoicer> {
     }
 
     public void writeAsXml(Invoicer invoicer, OutputStream out) {
-        invoicer = em.find(Invoicer.class, invoicer.getId());
+        invoicer = repository.findBy(invoicer.getId());
         invoicer.getInvoices().size();
         try {
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
@@ -100,9 +78,10 @@ public class InvoicerFacade extends AbstractFacade<Invoicer> {
 
     }
 
-    public Invoicer findJoined(Integer id) {
-        Invoicer in = em.find(Invoicer.class, id);
+    public Invoicer findJoined(Long id) {
+        Invoicer in = repository.findBy(id);
         in.getAdministrators().size(); // init lazy relation
+        in.getProducts().size();
         return in;
     }
 
