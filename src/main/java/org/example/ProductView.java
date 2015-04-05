@@ -39,7 +39,7 @@ public class ProductView extends MVerticalLayout implements View {
     });
 
     MTable<Product> table = new MTable<>(Product.class)
-            .withProperties("description", "price", "unit", "productState");
+            .withProperties("name", "price", "unit", "productState");
 
     @PostConstruct
     public void initComponent() {

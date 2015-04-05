@@ -10,7 +10,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.persistence.criteria.Fetch;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -87,7 +86,7 @@ public class Invoice extends AbstractEntity {
         double sum = 0;
         List<InvoiceRow> invoiceRows1 = getInvoiceRows();
         for (InvoiceRow r : invoiceRows1) {
-            sum += r.getAmount() * r.getPrice();
+            sum += r.getQuantity() * r.getPrice();
         }
         return sum;
     }

@@ -36,11 +36,10 @@ public class UserSession implements Serializable {
 
     protected void demoLogin() {
         final String email = "matti.meikalainen@gmail.com";
-        this.user = userFacade.findByEmail(email);
-        if (this.user == null) {
-            final User user = new User(email);
-            userFacade.create(user);
+        try {
             this.user = userFacade.findByEmail(email);
+        } catch (Exception e) {
+            this.user = userFacade.save(new User(email));
 
             Invoicer invoicer = new Invoicer();
             invoicer.setName("Matin pummpu ja imu");
@@ -52,8 +51,7 @@ public class UserSession implements Serializable {
             this.user.getAdministrates().add(invoicer);
             invoicerFacade.save(invoicer);
         }
-
-    }
+   }
 
     public User getUser() {
         return user;
@@ -73,7 +71,7 @@ public class UserSession implements Serializable {
         } catch (Exception e) {
         }
         if (user == null) {
-            userFacade.create(new User(email));
+            userFacade.save(new User(email));
             user = userFacade.findByEmail(email);
         }
     }

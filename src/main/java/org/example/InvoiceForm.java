@@ -42,11 +42,12 @@ public class InvoiceForm extends AbstractForm<Invoice> {
         TypedSelect<Product> product = new TypedSelect<>(Product.class)
                 .withSelectType(ComboBox.class)
                 .withWidth("150px")
-                .setInputPrompt("Load from...");
+                .setInputPrompt("Pick a product");
         MTextField description = new MTextField().withFullWidth();
-        MTextField amount = new MTextField().withWidth("3em");
+        MTextField quantity = new MTextField().withWidth("3em");
         MTextField unit = new MTextField().withWidth("3em");
         MTextField price = new MTextField().withWidth("3em");
+        
     }
     
     ElementCollectionField<InvoiceRow> invoiceRows = new ElementCollectionField<>(
@@ -58,12 +59,10 @@ public class InvoiceForm extends AbstractForm<Invoice> {
                 r.product.addMValueChangeListener(event -> {
                     if(event.getValue() != null) {
                         // Copy "default values" from Product to row
-                        r.description.setValue(event.getValue().getDescription());
                         r.price.setValue(event.getValue().getPrice().toString());
                         r.unit.setValue(event.getValue().getUnit());
 
-                        r.amount.focus();
-                        r.product.setValue(null);
+                        r.description.focus();
                     }
                 });
                 return r;

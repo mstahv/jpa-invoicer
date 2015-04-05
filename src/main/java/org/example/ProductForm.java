@@ -14,7 +14,7 @@ import org.vaadin.viritin.layouts.MVerticalLayout;
 @ViewScoped
 public class ProductForm extends AbstractForm<Product> {
 
-    TextField description = new MTextField("Description");
+    TextField name = new MTextField("Name");
     TextField unit = new MTextField("Unit");
     TextField price = new MTextField("Price");
     EnumSelect productState = new EnumSelect("State");
@@ -24,7 +24,7 @@ public class ProductForm extends AbstractForm<Product> {
         return new MVerticalLayout(
                 getToolbar(),
                 new FormLayout(
-                        description,
+                        name,
                         price,
                         unit,
                         productState

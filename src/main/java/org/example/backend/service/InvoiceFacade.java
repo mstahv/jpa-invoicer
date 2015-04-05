@@ -16,13 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import static org.example.InvoicesView.DEFAULT_DUE_DATE_DURATION;
-import org.example.backend.AbstractFacade;
 import org.example.backend.Invoice;
 import org.example.backend.InvoiceRow;
 import org.example.backend.Invoicer;
@@ -33,32 +27,20 @@ import org.example.backend.UserSession;
  * @author Matti Tahvonen
  */
 @Stateless
-public class InvoiceFacade extends AbstractFacade<Invoice> {
+public class InvoiceFacade {
 
-    @PersistenceContext(unitName = "invoicerdb")
-    private EntityManager em;
+    @Inject
+    InvoiceRepository repo;
 
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
-    }
-
-    public InvoiceFacade() {
-        super(Invoice.class);
-    }
+    @Inject
+    InvoicerRepository invoicerRepo;
 
     public List<Invoice> findAll(Invoicer value) {
-        final CriteriaBuilder cb = getEntityManager().
-                getCriteriaBuilder();
-        javax.persistence.criteria.CriteriaQuery cq = cb.createQuery();
-        Root r = cq.from(Invoice.class);
-        CriteriaQuery<Invoice> q = cq.select(r).where(cb.
-                equal(r.get("invoicer"), value));
-        return em.createQuery(q).getResultList();
+        return repo.findAll();
     }
 
     public Invoice createFor(Invoicer invoicer) {
-        invoicer = em.find(Invoicer.class, invoicer.getId());
+        invoicer = invoicerRepo.findBy(invoicer.getId());
         Invoice invoice = new Invoice();
         invoice.setInvoiceNumber(invoicer.getAndIcrementNextInvoiceNumber());
         invoice.setInvoicer(invoicer);
@@ -66,23 +48,22 @@ public class InvoiceFacade extends AbstractFacade<Invoice> {
         invoice.setDueDate(new Date(
                 System.currentTimeMillis() + DEFAULT_DUE_DATE_DURATION));
         invoice.setLastEditor(session.getUser());
-        em.merge(invoicer);
-        em.persist(invoice);
+        invoicerRepo.save(invoicer);
+        repo.save(invoice);
         return invoice;
     }
 
     @Inject
     UserSession session;
 
-    @Override
-    public void edit(Invoice entity) {
+    public Invoice save(Invoice entity) {
         entity.setLastEditor(session.getUser());
-        super.edit(entity);
+        return repo.save(entity);
     }
 
     public void writeAsOdt(Invoice invoice, OutputStream out) {
         Locale.setDefault(new Locale("fi"));
-        invoice = em.find(Invoice.class, invoice.getId());
+        invoice = repo.findBy(invoice.getId());
         invoice.getInvoiceRows().size();
         invoice.getInvoicer().getBankAccount();
         invoice.getInvoicer().getBankAccount();
@@ -105,7 +86,9 @@ public class InvoiceFacade extends AbstractFacade<Invoice> {
             ctx.put("invoice", invoice);
             ctx.put("to", invoice.getTo());
             ctx.put("r", invoice.getInvoiceRows());
-            ctx.put("sender", em.find(Invoicer.class, invoice.getInvoicer().getId()));
+            ctx.
+                    put("sender", invoicerRepo.findBy(invoice.getInvoicer().
+                                    getId()));
 
             // 4) Generate report by merging Java model with the ODT
             report.process(ctx, out);
@@ -116,7 +99,7 @@ public class InvoiceFacade extends AbstractFacade<Invoice> {
 
     public void writeAsPdf(Invoice invoice, OutputStream out) {
         Locale.setDefault(new Locale("fi"));
-        invoice = em.find(Invoice.class, invoice.getId());
+        invoice = repo.findBy(invoice.getId());
         List<InvoiceRow> invoiceRows = new ArrayList<>(invoice.getInvoiceRows());
         int size = invoice.getInvoiceRows().size();
         invoice.getInvoicer().getBankAccount();
@@ -138,7 +121,9 @@ public class InvoiceFacade extends AbstractFacade<Invoice> {
             ctx.put("invoice", invoice);
             ctx.put("to", invoice.getTo());
             ctx.put("r", invoiceRows);
-            ctx.put("sender", em.find(Invoicer.class, invoice.getInvoicer().getId()));
+            ctx.
+                    put("sender", invoicerRepo.findBy(invoice.getInvoicer().
+                                    getId()));
 
             // 4) Generate report by merging Java model with the ODT
             Options options = Options.getTo(ConverterTypeTo.PDF).via(
@@ -147,7 +132,11 @@ public class InvoiceFacade extends AbstractFacade<Invoice> {
             out.close();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
-        }        
+        }
+    }
+
+    public void remove(Invoice invoice) {
+        repo.remove(repo.findBy(invoice.getId()));
     }
 
 }

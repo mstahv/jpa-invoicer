@@ -130,7 +130,7 @@ public class InvoicesView extends MVerticalLayout implements View {
     }
 
     public void save(Invoice entity) {
-        facade.edit(entity);
+        facade.save(entity);
         Notification.show("Saved!");
         form.getPopup().close();
         listEntities();

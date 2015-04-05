@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -17,8 +18,8 @@ public class Product extends AbstractEntity {
         Active, Archived
     }
 
-    @Size(max = 250)
-    private String description;
+    @Size(max = 50)
+    private String name;
     
     @NotNull
     private State productState = State.Active;
@@ -54,6 +55,7 @@ public class Product extends AbstractEntity {
         this.unit = defaultUnit;
     }
 
+    @XmlTransient
     public Invoicer getInvoicer() {
         return invoicer;
     }
@@ -62,17 +64,17 @@ public class Product extends AbstractEntity {
         this.invoicer = invoicer;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
-    public void setDescription(String name) {
-        this.description = name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return description;
+        return name;
     }
     
 }   
