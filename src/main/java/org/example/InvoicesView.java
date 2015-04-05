@@ -62,7 +62,7 @@ public class InvoicesView extends MVerticalLayout implements View {
         table.setColumnWidth("lastEditor", 110);
         if (session.getUser().getAdministrates().isEmpty()) {
             Notification.show("Add invoicer first!");
-            ViewMenuUI.getMenu().navigateTo(InvoicerGroupsView.class);
+            ViewMenuUI.getMenu().navigateTo(MyAccount.class);
             return;
         }
         sender.addMValueChangeListener(e -> listEntities());
