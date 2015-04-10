@@ -28,7 +28,7 @@ public class InvoicerFacade {
     @Inject
     UserRepository userRepository;
 
-    public void save(Invoicer entity) {
+    public Invoicer save(Invoicer entity) {
         for (int i = 0; i < entity.getAdministrators().size(); i++) {
             User usr = entity.getAdministrators().get(i);
             User existing = userFacade.findByEmail(usr.getEmail());
@@ -40,7 +40,7 @@ public class InvoicerFacade {
                 userRepository.save(usr);
             }
         }
-        repository.save(entity);
+        return repository.save(entity);
     }
 
     @Inject

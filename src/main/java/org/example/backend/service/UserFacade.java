@@ -15,7 +15,11 @@ public class UserFacade {
     UserRepository repo;
 
     public User findByEmail(String email) {
-        return repo.findByEmail(email);
+        try {
+            return repo.findByEmail(email);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public User save(User user) {

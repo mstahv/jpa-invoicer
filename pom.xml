@@ -67,7 +67,11 @@
             <artifactId>viritin</artifactId>
             <version>1.31</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.vaadin.addon</groupId>
+            <artifactId>easyuploads</artifactId>
+            <version>7.4.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.deltaspike.modules</groupId>
             <artifactId>deltaspike-data-module-api</artifactId>

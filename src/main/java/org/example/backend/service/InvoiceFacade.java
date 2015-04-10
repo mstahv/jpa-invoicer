@@ -8,6 +8,7 @@ import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
 import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -74,8 +75,7 @@ public class InvoiceFacade {
         try {
             // 1) Load ODT file by filling Velocity template engine and cache
             // it to the registry
-            InputStream in = Invoice.class.getResourceAsStream(
-                    "/tmpl.odt");
+            InputStream in = getTemplate(invoice.getInvoicer());
             IXDocReport report = XDocReportRegistry.getRegistry().
                     loadReport(in, TemplateEngineKind.Freemarker);
 
@@ -97,6 +97,18 @@ public class InvoiceFacade {
         }
     }
 
+    protected static InputStream getTemplate(Invoicer invoicer) {
+        if(invoicer.getTemplate() == null) {
+            return getDefaultTemplate();
+        } else {
+            return new ByteArrayInputStream(invoicer.getTemplate());
+        }
+    }
+
+    public static InputStream getDefaultTemplate() {
+        return Invoice.class.getResourceAsStream("/tmpl.odt");
+    }
+
     public void writeAsPdf(Invoice invoice, OutputStream out) {
         Locale.setDefault(new Locale("fi"));
         invoice = repo.findBy(invoice.getId());
@@ -109,8 +121,7 @@ public class InvoiceFacade {
         try {
             // 1) Load ODT file by filling Velocity template engine and cache
             // it to the registry
-            InputStream in = Invoice.class.getResourceAsStream(
-                    "/tmpl.odt");
+            InputStream in = getTemplate(invoice.getInvoicer());
             IXDocReport report = XDocReportRegistry.getRegistry().
                     loadReport(in, TemplateEngineKind.Freemarker);
 

@@ -2,9 +2,11 @@ package org.example.backend;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.OneToMany;
@@ -12,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @NamedQueries({})
@@ -20,6 +23,10 @@ public class Invoicer extends AbstractEntity {
     
     @OneToMany(mappedBy = "invoicer", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
+    
+    @Lob
+    @Basic(fetch=FetchType.EAGER)
+    private byte[] template;
 
     @NotNull(message = "Name is required")
     @Size(min = 3, max = 40, message = "name must be longer than 3 and less than 40 characters")
@@ -48,6 +55,15 @@ public class Invoicer extends AbstractEntity {
 
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<User> administrators = new ArrayList<>();
+    
+    @XmlTransient
+    public byte[] getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(byte[] template) {
+        this.template = template;
+    }
 
     public int getNextInvoiceNumber() {
         return nextInvoiceNumber;

@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.deltaspike.core.api.config.ConfigResolver;
 import org.example.backend.service.InvoicerFacade;
+import org.example.backend.service.ProductFacade;
 import org.example.backend.service.UserFacade;
 
 /**
@@ -22,6 +23,9 @@ public class UserSession implements Serializable {
     @Inject
     InvoicerFacade invoicerFacade;
 
+    @Inject
+    ProductFacade productFacade;
+
     private User user;
 
     @PostConstruct
@@ -36,9 +40,8 @@ public class UserSession implements Serializable {
 
     protected void demoLogin() {
         final String email = "matti.meikalainen@gmail.com";
-        try {
-            this.user = userFacade.findByEmail(email);
-        } catch (Exception e) {
+        this.user = userFacade.findByEmail(email);
+        if (user == null) {
             this.user = userFacade.save(new User(email));
 
             Invoicer invoicer = new Invoicer();
@@ -49,9 +52,20 @@ public class UserSession implements Serializable {
             invoicer.setPhone("+34567890");
             invoicer.getAdministrators().add(this.user);
             this.user.getAdministrates().add(invoicer);
-            invoicerFacade.save(invoicer);
+            invoicer = invoicerFacade.save(invoicer);
+            Product product = new Product();
+            product.setName("Pumppu");
+            product.setPrice(30.0);
+            product.setInvoicer(invoicer);
+            productFacade.save(product);
+            product = new Product();
+            product.setName("Imuri");
+            product.setPrice(60.0);
+            product.setInvoicer(invoicer);
+            productFacade.save(product);
+
         }
-   }
+    }
 
     public User getUser() {
         return user;
