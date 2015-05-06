@@ -31,9 +31,9 @@ public class InvoiceForm extends AbstractForm<Invoice> {
     @Inject
     ProductFacade productFacade;
     
-    DateField invoiceDate = new DateField("invoiceDate");
+    DateField invoiceDate = new DateField("Date");
     
-    DateField dueDate = new DateField("dueDate");
+    DateField dueDate = new DateField("Due Date");
     
     Header total = new Header("").setHeaderLevel(3);
     

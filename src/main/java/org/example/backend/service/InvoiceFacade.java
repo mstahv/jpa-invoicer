@@ -112,33 +112,33 @@ public class InvoiceFacade {
     public void writeAsPdf(Invoice invoice, OutputStream out) {
         Locale.setDefault(new Locale("fi"));
         invoice = repo.findBy(invoice.getId());
-        List<InvoiceRow> invoiceRows = new ArrayList<>(invoice.getInvoiceRows());
-        int size = invoice.getInvoiceRows().size();
-        invoice.getInvoicer().getBankAccount();
-        invoice.getInvoicer().getEmail();
-        invoice.getInvoicer().getAddress();
-        invoice.getInvoicer().getPhone();
+        
         try {
-            // 1) Load ODT file by filling Velocity template engine and cache
-            // it to the registry
+            
+            // Get template stream (either the default or overridden by the user)
             InputStream in = getTemplate(invoice.getInvoicer());
+
+            // Prepare the IXDocReport instance based on the template, using
+            // Freemarker template engine
             IXDocReport report = XDocReportRegistry.getRegistry().
                     loadReport(in, TemplateEngineKind.Freemarker);
+            
+            // Define what we want to do (PDF file from ODF template)
+            Options options = Options.getTo(ConverterTypeTo.PDF).via(
+                    ConverterTypeVia.ODFDOM);
 
-            FieldsMetadata metadata = report.createFieldsMetadata();
-            metadata.load("r", InvoiceRow.class, true);
-
+            // Add properties to the context
             IContext ctx = report.createContext();
             ctx.put("invoice", invoice);
             ctx.put("to", invoice.getTo());
-            ctx.put("r", invoiceRows);
-            ctx.
-                    put("sender", invoicerRepo.findBy(invoice.getInvoicer().
-                                    getId()));
-
-            // 4) Generate report by merging Java model with the ODT
-            Options options = Options.getTo(ConverterTypeTo.PDF).via(
-                    ConverterTypeVia.ODFDOM);
+            ctx.put("sender", invoice.getInvoicer());
+            // instruct XDocReport to inspect InvoiceRow entity as well
+            // which is given as list and iterated in a table
+            FieldsMetadata metadata = report.createFieldsMetadata();
+            metadata.load("r", InvoiceRow.class, true);
+            ctx.put("r", invoice.getInvoiceRows());
+            
+            // Write the PDF file to output stream
             report.convert(ctx, options, out);
             out.close();
         } catch (Exception ex) {

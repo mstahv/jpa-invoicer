@@ -1,16 +1,18 @@
 package org.example.auth;
 
 import com.google.gson.Gson;
-import com.vaadin.server.BrowserWindowOpener;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServletResponse;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.IOException;
 import javax.inject.Inject;
 import org.apache.deltaspike.core.api.config.ConfigProperty;
@@ -22,8 +24,6 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.label.Header;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 /**
@@ -32,9 +32,7 @@ import org.vaadin.viritin.layouts.MVerticalLayout;
  */
 public class LoginWindow extends Window implements RequestHandler {
 
-    private final Header loginHeader = new Header("Login with Google+");
-
-    private final Button gplusLoginButton = new MButton("Login");
+    private Link gplusLoginButton;
 
     OAuthService service;
 
@@ -46,18 +44,19 @@ public class LoginWindow extends Window implements RequestHandler {
     public void attach() {
         super.attach();
 
-        setContent(new MVerticalLayout(loginHeader, gplusLoginButton));
-
         service = createService();
         String url = service.getAuthorizationUrl(null);
-
-        BrowserWindowOpener opener = new BrowserWindowOpener(url);
-        opener.setWindowName("_top");
-        opener.extend(gplusLoginButton);
+        
+        gplusLoginButton = new Link("Login with Google", new ExternalResource(url));
+        gplusLoginButton.addStyleName(ValoTheme.LINK_LARGE);
 
         VaadinSession.getCurrent().addRequestHandler(this);
 
+        setContent(new MVerticalLayout(gplusLoginButton).alignAll(
+                Alignment.MIDDLE_CENTER).withFullHeight());
         setModal(true);
+        setWidth("300px");
+        setHeight("200px");
 
     }
 

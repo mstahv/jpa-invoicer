@@ -45,16 +45,17 @@ public class TemplateField extends UploadField {
         byte[] value = (byte[]) getValue();
         if (value == null || value.length == 0) {
             dspl.addComponent(new Label("not set"));
+            // Allow user to download the default template for customization
             dspl.addComponents(new DownloadButton(stream -> {
                 try {
                     IOUtils.copy(InvoiceFacade.getDefaultTemplate(), stream);
-                    stream.close();
                 } catch (IOException ex) {
                     Logger.getLogger(InvoicerForm.class.getName()).
                             log(Level.SEVERE, null, ex);
                 }
             }).setFileName("template.odt").withCaption("download default"));
         } else {
+            // Allow user to download the template for customization
             dspl.addComponents(new DownloadButton(stream -> {
                 try {
                     IOUtils.copy(getContentAsStream(), stream);

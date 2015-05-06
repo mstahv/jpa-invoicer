@@ -5,10 +5,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
-import javax.inject.Inject;
 import org.example.backend.Invoicer;
 import org.example.backend.User;
-import org.example.backend.service.UserFacade;
 import org.vaadin.easyuploads.UploadField;
 import org.vaadin.viritin.fields.ElementCollectionField;
 import org.vaadin.viritin.fields.MTextField;
@@ -31,9 +29,6 @@ public class InvoicerForm extends AbstractForm<Invoicer> {
     TextField nextInvoiceNumber = new MTextField("next invoice number");
 
     UploadField template = new TemplateField();
-
-    @Inject
-    UserFacade userFacade;
 
     public static class UserRow {
 

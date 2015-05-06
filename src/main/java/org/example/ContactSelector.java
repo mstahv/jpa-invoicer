@@ -3,6 +3,7 @@ package org.example;
 import com.vaadin.cdi.ViewScoped;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -56,7 +57,8 @@ public class ContactSelector extends LazyComboBox<Contact> implements
         setCaption("Customer");
         getSelect().setNewItemHandler(this);
         getSelect().setNewItemsAllowed(true);
-        setSizeUndefined();
+        setWidth("300px");
+        ((ComboBox) getSelect()).setInputPrompt("Type new or choose existing");
 
     }
 
