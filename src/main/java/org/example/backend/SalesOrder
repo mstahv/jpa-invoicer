@@ -1,0 +1,175 @@
+package org.example.backend;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlTransient;
+
+/**
+ *
+ * @author Matti Tahvonen,  Mortoza Khan
+ */
+
+@Entity
+public class SalesOrder extends AbstractEntity {
+
+    public static enum Status {
+        New, GoodsIssued, Invoiced
+    }
+
+    @NotNull
+    private Integer orderNumber;
+
+    @NotNull(message = "Please select the customer...")
+    @ManyToOne
+    private Contact to;
+
+    @ManyToOne
+    private Invoicer invoicer;
+
+    @ManyToOne
+    private User lastEditor;
+
+    @NotNull(message = "Null Date value is not accepted")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastEdited;
+
+    @NotNull
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date orderDate;
+    
+    @OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL, mappedBy = "salesOrder")
+    private List<SalesOrderRow> salesOrderRows = new ArrayList<>();
+
+    
+    private String orderReference;
+    
+    
+
+    public User getLastEditor() {
+        return lastEditor;
+    }
+
+    public void setLastEditor(User lastEditor) {
+        this.lastEditor = lastEditor;
+        lastEdited = new Date();
+    }
+
+
+    public Date getLastEdited() {
+        return lastEdited;
+    }
+
+    public void setLastEdited(Date lastEdited) {
+        this.lastEdited = lastEdited;
+    }
+
+    public Integer getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(Integer orderNumber) {
+        this.orderNumber = orderNumber;
+    }
+
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public String getOrderReference() {
+        return orderReference;
+    }
+
+    public void setOrderReference(String orderReference) {
+        this.orderReference = orderReference;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public List<SalesOrderRow> getSalesOrderRows() {
+        return salesOrderRows;
+    }
+
+    public void setSalesOrderRows(List<SalesOrderRow> salesOrderRows) {
+        this.salesOrderRows = salesOrderRows;
+    }
+
+ 
+
+    @Transient
+    public Double getTotal() {
+        double sum = 0;
+        List<SalesOrderRow> salesOrderRows1 = getSalesOrderRows();
+        for (SalesOrderRow r : salesOrderRows1) {
+            sum += r.getQuantity() * r.getPrice();
+        }
+        return sum;
+    }
+
+    @Transient
+    public String getReference() {
+        int ordernr = getOrderNumber();
+        int checksum = 0;
+        int counter = 0;
+        int[] multipliers = {7, 3, 1};
+        while (ordernr > 0) {
+            int d = ordernr % 10;
+            ordernr = ordernr / 10;
+            checksum += d * multipliers[counter % multipliers.length];
+            counter++;
+        }
+        checksum = checksum % 10;
+        checksum = 10 - checksum;
+        checksum = checksum % 10;
+        String ref = "" + getOrderNumber() + checksum;
+        return ref;
+    }
+
+
+    @XmlTransient
+    public Invoicer getInvoicer() {
+        return invoicer;
+    }
+
+    public void setInvoicer(Invoicer invoicer) {
+        this.invoicer = invoicer;
+    }
+
+
+    public Contact getTo() {
+        return to;
+    }
+
+    public void setTo(Contact to) {
+        this.to = to;
+    }
+
+    @Temporal(TemporalType.DATE)
+    public Date getSalesOrderDate() {
+        return orderDate;
+    }
+
+    public void setSalesOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
+
+}
