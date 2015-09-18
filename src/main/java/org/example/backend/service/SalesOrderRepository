@@ -1,0 +1,31 @@
+
+package org.example.backend.service;
+
+import org.apache.deltaspike.data.api.EntityRepository;
+import org.apache.deltaspike.data.api.Repository;
+import org.example.backend.SalesOrder;
+
+/**
+ * 18 Sep 2015
+ * @author Matti Tahvonen, Mortoza Khan
+ */
+@Repository(forEntity = SalesOrder.class)
+public interface SalesOrderRepository extends EntityRepository<SalesOrder, Long> {
+
+    
+}
+package org.example.backend.service;
+
+import org.apache.deltaspike.data.api.EntityRepository;
+import org.apache.deltaspike.data.api.Repository;
+import org.example.backend.SalesOrder;
+
+/**
+ * 18 Sep 2015
+ * @author Matti Tahvonen, Mortoza Khan
+ */
+@Repository(forEntity = SalesOrder.class)
+public interface SalesOrderRepository extends EntityRepository<SalesOrder, Long> {
+
+    
+}
