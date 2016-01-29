@@ -1,5 +1,28 @@
 package org.example.backend.service;
 
+import static org.example.InvoicesView.DEFAULT_DUE_DATE_DURATION;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.mail.util.ByteArrayDataSource;
+
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.MultiPartEmail;
+import org.apache.deltaspike.core.api.config.ConfigProperty;
+import org.example.backend.Invoice;
+import org.example.backend.InvoiceRow;
+import org.example.backend.Invoicer;
+import org.example.backend.UserSession;
+
 import fr.opensagres.xdocreport.converter.ConverterTypeTo;
 import fr.opensagres.xdocreport.converter.ConverterTypeVia;
 import fr.opensagres.xdocreport.converter.Options;
@@ -8,20 +31,6 @@ import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
 import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import static org.example.InvoicesView.DEFAULT_DUE_DATE_DURATION;
-import org.example.backend.Invoice;
-import org.example.backend.InvoiceRow;
-import org.example.backend.Invoicer;
-import org.example.backend.UserSession;
 
 /**
  *
@@ -35,6 +44,33 @@ public class InvoiceFacade {
 
     @Inject
     InvoicerRepository invoicerRepo;
+
+    @Inject
+    @ConfigProperty(name = "jpa-invoicer.smtp.username")
+    private String smtpUsername;
+    @Inject
+    @ConfigProperty(name = "jpa-invoicer.smtp.password")
+    private String smtpPassword;
+
+    @Inject
+    @ConfigProperty(name = "jpa-invoicer.smtp.hostname")
+    private String smtpHostname;
+
+    @Inject
+    @ConfigProperty(name = "jpa-invoicer.smtp.port")
+    private Integer smtpPort;
+
+    @Inject
+    @ConfigProperty(name = "jpa-invoicer.smtp.from")
+    private String smtpFrom;
+
+    @Inject
+    @ConfigProperty(name = "jpa-invoicer.smtp.subject")
+    private String smtpSubject;
+
+    @Inject
+    @ConfigProperty(name = "jpa-invoicer.smtp.message")
+    private String smtpMessage;
 
     public List<Invoice> findAll(Invoicer value) {
         return repo.findAll();
@@ -150,4 +186,23 @@ public class InvoiceFacade {
         repo.remove(repo.findBy(invoice.getId()));
     }
 
+    public void sendInvoice(final Invoice invoice) throws EmailException, IOException {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            writeAsPdf(invoice, out);
+            ByteArrayDataSource dataSource =
+                    new ByteArrayDataSource(out.toByteArray(), "application/pdf");
+            String fileName = "invoice_" + invoice.getInvoiceNumber() + ".pdf";
+
+            MultiPartEmail email = new MultiPartEmail();
+            email.setAuthentication(smtpUsername, smtpPassword);
+            email.setHostName(smtpHostname);
+            email.setSmtpPort(smtpPort);
+            email.setFrom(smtpFrom);
+            email.addTo(invoice.getInvoicer().getEmail());
+            email.setSubject(smtpSubject);
+            email.setMsg(smtpMessage);
+            email.attach(dataSource, fileName, "Invoice");
+            email.send();
+        }
+    }
 }

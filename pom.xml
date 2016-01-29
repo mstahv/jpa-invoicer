@@ -16,6 +16,11 @@
         is available for delta spike properties.        -->
         <jpa-invoicer.gpluskey></jpa-invoicer.gpluskey>
         <jpa-invoicer.gplussecret></jpa-invoicer.gplussecret>
+        <jpa-invoicer.smtp.hostname>localhost</jpa-invoicer.smtp.hostname>
+        <jpa-invoicer.smtp.port>9090</jpa-invoicer.smtp.port>
+        <jpa-invoicer.smtp.from>invoicer@vaadin.com</jpa-invoicer.smtp.from>
+        <jpa-invoicer.smtp.subject>Invoice</jpa-invoicer.smtp.subject>
+        <jpa-invoicer.smtp.message>Please find attached your invoice. Thanks!</jpa-invoicer.smtp.message>
     </properties>
     
     <dependencies>
@@ -89,6 +94,12 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.4</version>
         </dependency>
 
     </dependencies>

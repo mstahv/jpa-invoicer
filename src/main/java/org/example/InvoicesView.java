@@ -1,5 +1,7 @@
 package org.example;
 
+import java.io.IOException;
+
 import com.vaadin.cdi.CDIView;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -10,6 +12,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.themes.ValoTheme;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
+import org.apache.commons.mail.EmailException;
 import org.example.backend.Invoice;
 import org.example.backend.UserSession;
 import org.example.backend.service.InvoiceFacade;
@@ -114,7 +118,12 @@ public class InvoicesView extends MVerticalLayout implements View {
                             "invoice_" + invoice.getInvoiceNumber() + ".pdf")
                     .withIcon(FontAwesome.FILE_PDF_O)
                     .withStyleName(ValoTheme.BUTTON_ICON_ONLY);
-            actions.add(odtDownload, pdfDownload);
+
+            final MButton sendInvoice = new MButton()
+                    .withIcon(FontAwesome.ENVELOPE_O)
+                    .withStyleName(ValoTheme.BUTTON_ICON_ONLY)
+                    .withListener(e -> sendInvoiceClicked(invoice));
+            actions.add(odtDownload, pdfDownload, sendInvoice);
         }
 
         final MButton deleteButton = new ConfirmButton(
@@ -143,8 +152,18 @@ public class InvoicesView extends MVerticalLayout implements View {
     }
 
     @Override
-    public
-            void enter(ViewChangeListener.ViewChangeEvent event) {
+    public void enter(ViewChangeListener.ViewChangeEvent event) {
+    }
+
+    private void sendInvoiceClicked(final Invoice invoice) {
+        try {
+            facade.sendInvoice(invoice);
+            Notification.show("Invoice sent");
+        } catch (EmailException | IOException e) {
+            e.printStackTrace();
+            Notification.show("Error sending the invoice",
+                    Notification.Type.ERROR_MESSAGE);
+        }
     }
 
 }
