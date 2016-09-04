@@ -14,3 +14,12 @@ Features:
 This is a suitable basis for small to medium sized apps. For larger applications,
 consider using MVP to structure your UI code. See e.g. [this example 
 application](https://github.com/peterl1084/cdiexample).
+
+## Quickstart
+
+Start the application with an embedded wildfly:
+```
+mvn clean package wildfly:run
+```
+
+After startup the application is available here: [http://localhost:8080/invoicer](http://localhost:8080/invoicer)
