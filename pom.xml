@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.vaadin</groupId>
             <artifactId>vaadin-java-ee-essentials</artifactId>
-            <version>1.13</version>
+            <version>1.15</version>
             <type>pom</type>
             <exclusions>
                 <!-- Using add-ons in this example via cdn 
@@ -38,7 +38,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
         <dependency>  
             <groupId>javax</groupId>    
             <artifactId>javaee-web-api</artifactId>    
@@ -68,14 +67,9 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.vaadin</groupId>
-            <artifactId>viritin</artifactId>
-            <version>1.31</version>
-        </dependency>
-        <dependency>
             <groupId>org.vaadin.addon</groupId>
             <artifactId>easyuploads</artifactId>
-            <version>7.4.1</version>
+            <version>7.4.10</version>
         </dependency>
         <dependency>
             <groupId>org.apache.deltaspike.modules</groupId>
@@ -102,7 +96,26 @@
             <version>1.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.vaadin</groupId>
+            <artifactId>viritin</artifactId>
+            <version>1.58</version>
+        </dependency>
+
     </dependencies>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-bom</artifactId>
+                <version>7.7.4</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     
     <build>
         <resources>
@@ -130,16 +143,20 @@
                 <version>1.0.2.Final</version>
             </plugin>
             <plugin>
-                <groupId>com.vaadin.wscdn</groupId>
-                <artifactId>wscdn-maven-plugin</artifactId>
-                <version>0.0.2</version>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <version>7.7.4</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>update-widgetset</goal>
+                            <goal>compile</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <widgetsetMode>cdn</widgetsetMode>
+                </configuration>
             </plugin>
         </plugins>
     </build>

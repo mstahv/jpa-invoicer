@@ -102,8 +102,9 @@ public class ContactSelector extends LazyComboBox<Contact> implements
     }
 
     @Override
-    protected void setCompositionRoot(Component compositionRoot) {
-        super.setCompositionRoot(new MHorizontalLayout(compositionRoot, edit));
+    protected Component initContent() {
+        final Component compositionRoot = super.initContent();
+        return new MHorizontalLayout(compositionRoot, edit);
     }
-
+    
 }

@@ -20,7 +20,7 @@ public class User extends AbstractEntity {
     @Pattern(regexp = ".+@.+\\.[a-z]+", message = "Must be valid email")
     private String email;
 
-    @ManyToMany(mappedBy = "administrators", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "administrators", fetch = FetchType.LAZY)
     private List<Invoicer> administrates = new ArrayList<>();
 
     public User() {
