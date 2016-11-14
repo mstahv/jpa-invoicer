@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.vaadin</groupId>
             <artifactId>vaadin-java-ee-essentials</artifactId>
-            <version>1.15</version>
+            <version>1.16-SNAPSHOT</version>
             <type>pom</type>
             <exclusions>
                 <!-- Using add-ons in this example via cdn 
