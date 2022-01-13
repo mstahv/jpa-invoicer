@@ -1,27 +1,24 @@
 package org.example;
 
-import com.vaadin.cdi.CDIView;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Notification;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.router.Route;
+import org.example.backend.Product;
+import org.example.backend.service.ProductFacade;
+import org.vaadin.firitin.components.grid.VGrid;
+import org.vaadin.firitin.components.orderedlayout.VHorizontalLayout;
+import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import com.vaadin.ui.Button;
-import org.example.backend.Product;
-import org.vaadin.viritin.fields.MTable;
-import org.vaadin.viritin.label.Header;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-import org.example.backend.service.ProductFacade;
-import org.vaadin.viritin.button.PrimaryButton;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 /**
  *
  * @author Mortoza Khan
  */
-@CDIView
-public class ProductView extends MVerticalLayout implements View {
+@Route
+public class ProductView extends VVerticalLayout {
 
     @Inject
     ProductFacade facade;
@@ -31,43 +28,44 @@ public class ProductView extends MVerticalLayout implements View {
     @Inject
     InvoicerSelect invoicerSelect;
 
-    Button newButton = new PrimaryButton("New", e -> {
+    // TODO PrimaryButon
+    Button newButton = new Button("New", e -> {
         Product p = new Product();
         p.setInvoicer(invoicerSelect.getValue());
         form.setEntity(p);
         form.openInModalPopup();
     });
 
-    MTable<Product> table = new MTable<>(Product.class)
+    VGrid<Product> table = new VGrid<>(Product.class)
             .withProperties("name", "price", "unit", "productState");
 
     @PostConstruct
     public void initComponent() {
 
-        invoicerSelect.addMValueChangeListener(e -> listEntities());
+        invoicerSelect.addValueChangeListener(e -> listEntities());
 
         form.setResetHandler(this::reset);
         form.setSavedHandler(this::save);
 
         table.setWidth("400px");
-        //table.setHeight("400px");
-        table.setColumnCollapsingAllowed(true);
-        table.addMValueChangeListener(e -> {
+        //table.setColumnCollapsingAllowed(true);
+        
+        table.asSingleSelect().addValueChangeListener(e -> {
             form.setEntity(e.getValue());
             form.openInModalPopup();
         });
 
         listEntities();
 
-        addComponents(new Header("Product listing"),
-                new MHorizontalLayout(invoicerSelect, newButton)
-                .alignAll(Alignment.MIDDLE_LEFT),
+        add(new H1("Product listing"),
+                new VHorizontalLayout(invoicerSelect, newButton)
+                .alignAll(Alignment.CENTER),
                 table
         );
     }
 
     private void listEntities() {
-        table.setBeans(facade.findByInvoicer(invoicerSelect.getValue()));
+        table.setItems(facade.findByInvoicer(invoicerSelect.getValue()));
     }
 
     public void save(Product entity) {
@@ -82,10 +80,6 @@ public class ProductView extends MVerticalLayout implements View {
         form.setEntity(null);
         form.getPopup().close();
         listEntities();
-    }
-
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
     }
 
 }

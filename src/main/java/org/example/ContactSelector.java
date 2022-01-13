@@ -1,26 +1,22 @@
 package org.example;
 
-import com.vaadin.cdi.ViewScoped;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
+import com.vaadin.cdi.annotation.RouteScoped;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.example.backend.Contact;
 import org.example.backend.service.ContactFacade;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.fields.LazyComboBox;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.firitin.components.button.VButton;
+import org.vaadin.firitin.components.orderedlayout.VHorizontalLayout;
 
 /**
  * An entity selector component that allows to dynamically add entities.
  *
  * @author Matti Tahvonen
  */
-@ViewScoped
-public class ContactSelector extends LazyComboBox<Contact> implements
-        AbstractSelect.NewItemHandler {
+@RouteScoped
+public class ContactSelector extends ComboBox<Contact> {
     protected static final int PAGE_SIZE = 15;
 
     @Inject
@@ -31,12 +27,13 @@ public class ContactSelector extends LazyComboBox<Contact> implements
 
     ContactForm form = new ContactForm();
 
-    MButton edit = new MButton(FontAwesome.EDIT, e -> {
+    VButton edit = new VButton(VaadinIcon.EDIT.create(), e -> {
         editSelected();
     });
 
     @PostConstruct
     void init() {
+        /* TODO
         initList(Contact.class,
                 (int firstRow, String filter) -> contactFacade.findPaged(
                         invoicerSelect.getValue(), 
@@ -47,31 +44,36 @@ public class ContactSelector extends LazyComboBox<Contact> implements
                         invoicerSelect.getValue(), 
                         filter),
                 PAGE_SIZE);
+*/
         updatelist();
         edit.setEnabled(false);
-        getSelect().addValueChangeListener(e -> edit.setEnabled(
+        addValueChangeListener(e -> edit.setEnabled(
                 getValue() != null));
 
-        invoicerSelect.addMValueChangeListener(e -> updatelist());
+//        invoicerSelect.addMValueChangeListener(e -> updatelist());
 
-        setCaption("Customer");
+        setLabel("Customer");
+
+        /* TODO
         getSelect().setNewItemHandler(this);
         getSelect().setNewItemsAllowed(true);
+        */
         setWidth("300px");
-        ((ComboBox) getSelect()).setInputPrompt("Type new or choose existing");
+        setPlaceholder("Type new or choose existing");
 
     }
 
     void updatelist() {
-        refresh();
+        // TODO
+        //refresh();
     }
 
-    @Override
+//    @Override
     public void addNewItem(String newItemCaption) {
         // make contact with detail
         Contact contact = new Contact();
         contact.setName(newItemCaption);
-        contact.setInvoicer(invoicerSelect.getValue());
+//        contact.setInvoicer(invoicerSelect.getValue());
         form.setEntity(contact);
         form.setSavedHandler(entity -> {
             contactFacade.save(entity);
@@ -82,7 +84,7 @@ public class ContactSelector extends LazyComboBox<Contact> implements
         form.setResetHandler(e -> {
             form.getPopup().close();
         });
-        form.openInModalPopup().setCaption("Add new customer");
+  //      form.openInModalPopup().setCaption("Add new customer");
         form.getSaveButton().setEnabled(true); // new item
     }
 
@@ -97,14 +99,14 @@ public class ContactSelector extends LazyComboBox<Contact> implements
         form.setResetHandler(e -> {
             form.getPopup().close();
         });
-        form.openInModalPopup().setCaption("Edit customer");
+    //    form.openInModalPopup().setCaption("Edit customer");
 
     }
 
-    @Override
-    protected Component initContent() {
-        final Component compositionRoot = super.initContent();
-        return new MHorizontalLayout(compositionRoot, edit);
-    }
+//    @Override
+//    protected Component initContent() {
+//        final Component compositionRoot = super.initContent();
+//        return new VHorizontalLayout(compositionRoot, edit);
+//    }
     
 }

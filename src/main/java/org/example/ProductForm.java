@@ -1,44 +1,39 @@
 package org.example;
 
-import com.vaadin.cdi.ViewScoped;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.Window;
+import com.vaadin.cdi.annotation.RouteScoped;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import org.example.backend.Product;
-import org.vaadin.viritin.fields.EnumSelect;
-import org.vaadin.viritin.fields.MTextField;
-import org.vaadin.viritin.form.AbstractForm;
-import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
+import org.vaadin.firitin.components.textfield.VTextField;
+import org.vaadin.firitin.form.AbstractForm;
 
-@ViewScoped
+@RouteScoped
 public class ProductForm extends AbstractForm<Product> {
 
-    TextField name = new MTextField("Name");
-    TextField unit = new MTextField("Unit");
-    TextField price = new MTextField("Price");
-    EnumSelect productState = new EnumSelect("State");
+    TextField name = new VTextField("Name");
+    TextField unit = new VTextField("Unit");
+    TextField price = new VTextField("Price");
+
+    public ProductForm() {
+        super(Product.class);
+    }
+    // TODO EnumSelect productState = new EnumSelect("State");
 
     @Override
     protected Component createContent() {
-        return new MVerticalLayout(
+        return new VVerticalLayout(
                 getToolbar(),
                 new FormLayout(
                         name,
                         price,
-                        unit,
-                        productState
+                        unit
+                        //,
+                 //       productState
                 )
         );
     }
 
-    @Override
-    public Window openInModalPopup() {
-        final Window openInModalPopup = super.openInModalPopup();
-        openInModalPopup.setWidth("400px");
-        return openInModalPopup;
-    }
-    
-    
 
 }

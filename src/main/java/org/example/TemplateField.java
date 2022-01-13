@@ -1,23 +1,15 @@
 package org.example;
 
-import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.io.IOUtils;
-import org.example.backend.service.InvoiceFacade;
-import org.vaadin.easyuploads.UploadField;
-import org.vaadin.viritin.button.DownloadButton;
+import com.vaadin.flow.component.upload.Upload;
 
 /**
  *
  * @author Matti Tahvonen
  */
-public class TemplateField extends UploadField {
+public class TemplateField extends Upload {
 
     public TemplateField() {
+        /*
         super(StorageMode.MEMORY);
         setFieldType(FieldType.BYTE_ARRAY);
         setCaption("Custom template");
@@ -25,8 +17,9 @@ public class TemplateField extends UploadField {
         // Only allow ODT files, smaller than 4MB
         setAcceptFilter("application/vnd.oasis.opendocument.text");
         setMaxFileSize(4000000);
+*/
     }
-
+/*
     @Override
     protected Component createDisplayComponent() {
         return new CssLayout();
@@ -66,4 +59,5 @@ public class TemplateField extends UploadField {
             }).setFileName("template.odt").withCaption("download"));
         }
     }
+*/
 }

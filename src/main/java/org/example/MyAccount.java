@@ -1,25 +1,21 @@
 package org.example;
 
-import com.vaadin.cdi.CDIView;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Notification;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.router.Route;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.example.backend.Invoicer;
 import org.example.backend.UserSession;
 import org.example.backend.service.InvoicerFacade;
-import org.vaadin.cdiviewmenu.ViewMenuItem;
-import org.vaadin.viritin.fields.MTable;
-import org.vaadin.viritin.label.Header;
-import org.vaadin.viritin.label.RichText;
-import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.firitin.components.RichText;
+import org.vaadin.firitin.components.grid.VGrid;
+import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
 
-@CDIView
-@ViewMenuItem(icon = FontAwesome.LIFE_BOUY, order = ViewMenuItem.END)
-public class MyAccount extends MVerticalLayout implements View {
+@Route
+//@ViewMenuItem(icon = FontAwesome.LIFE_BOUY, order = ViewMenuItem.END)
+public class MyAccount extends VVerticalLayout {
 
     @Inject
     InvoicerFacade cf;
@@ -30,7 +26,7 @@ public class MyAccount extends MVerticalLayout implements View {
     @Inject
     InvoicerForm form;
 
-    MTable<Invoicer> table = new MTable<>(Invoicer.class)
+    VGrid<Invoicer> table = new VGrid<>(Invoicer.class)
             .withProperties("id", "name", "email");
 
     @PostConstruct
@@ -42,7 +38,7 @@ public class MyAccount extends MVerticalLayout implements View {
         form.setResetHandler(this::reset);
         form.setSavedHandler(this::save);
 
-        table.addMValueChangeListener(e -> editEntity(e.getValue()));
+        table.asSingleSelect().addValueChangeListener(e -> editEntity(e.getValue()));
 
         Button addButton = new Button("Add");
         addButton.addClickListener(e -> {
@@ -52,14 +48,15 @@ public class MyAccount extends MVerticalLayout implements View {
         });
 
         add(
-                new Header("Invoicers you administrate").setHeaderLevel(3),
+                new H3("Invoicers you administrate"),
                 addButton
-        ).expand(table);
+        );
+        addAndExpand(table);
         listEntities();
     }
 
     private void listEntities() {
-        table.setBeans(session.getUser().getAdministrates());
+        table.setItems(session.getUser().getAdministrates());
     }
 
     private void editEntity(Invoicer invoicer) {
@@ -83,9 +80,10 @@ public class MyAccount extends MVerticalLayout implements View {
             }
             Notification.show("Saved!");
         } catch (Exception e) {
-            Notification.show("Saving failed!",
-                    "Most probably concurrently edited",
-                    Notification.Type.WARNING_MESSAGE);
+            Notification.show("Saving failed!"
+                    //,"Most probably concurrently edited",
+                    //Notification.Type.WARNING_MESSAGE
+            );
         }
         listEntities();
         form.getPopup().close();
@@ -96,7 +94,4 @@ public class MyAccount extends MVerticalLayout implements View {
         form.getPopup().close();
     }
 
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
-    }
 }

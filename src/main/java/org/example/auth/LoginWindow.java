@@ -1,20 +1,22 @@
 package org.example.auth;
 
 import com.google.gson.Gson;
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.Page;
-import com.vaadin.server.RequestHandler;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinResponse;
-import com.vaadin.server.VaadinServletResponse;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Link;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
+import com.vaadin.flow.router.Router;
+import com.vaadin.flow.server.*;
+
 import java.io.IOException;
+import java.net.URL;
 import javax.inject.Inject;
+
+import com.vaadin.flow.theme.lumo.Lumo;
 import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.example.backend.UserSession;
 import org.scribe.builder.ServiceBuilder;
@@ -24,65 +26,63 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
-import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
 
 /**
  *
  * @author Matti Tahvonen
  */
-public class LoginWindow extends Window implements RequestHandler {
+public class LoginWindow extends Dialog implements RequestHandler {
 
-    private Link gplusLoginButton;
+    private Anchor gplusLoginButton;
 
     OAuthService service;
 
     @Inject
     UserSession userSession;
-    final String redirectUrl;
+    String redirectUrl;
 
     @Override
-    public void attach() {
-        super.attach();
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
 
-        service = createService();
-        String url = service.getAuthorizationUrl(null);
-        
-        gplusLoginButton = new Link("Login with Google", new ExternalResource(url));
-        gplusLoginButton.addStyleName(ValoTheme.LINK_LARGE);
+        UI.getCurrent().getPage().fetchCurrentURL(currentUrl -> {
+            redirectUrl = currentUrl.toString();
+            service = createService(currentUrl);
+            String url = service.getAuthorizationUrl(null);
 
-        VaadinSession.getCurrent().addRequestHandler(this);
+            gplusLoginButton = new Anchor(url, "Login with Google");
+            //TODO gplusLoginButton.addStyleName(ValoTheme.LINK_LARGE);
 
-        setContent(new MVerticalLayout(gplusLoginButton).alignAll(
-                Alignment.MIDDLE_CENTER).withFullHeight());
-        setModal(true);
-        setWidth("300px");
-        setHeight("200px");
+            VaadinSession.getCurrent().addRequestHandler(this);
+
+            add(new VVerticalLayout(gplusLoginButton)
+                    .alignAll(FlexComponent.Alignment.CENTER).withFullHeight());
+            setModal(true);
+            setWidth("300px");
+            setHeight("200px");
+        });
 
     }
 
     public void authDenied(String reason) {
-        Notification.show("authDenied:" + reason,
-                Notification.Type.ERROR_MESSAGE);
+        Notification.show("authDenied:" + reason
+                /* TODO,
+                Notification.Type.ERROR_MESSAGE*/);
     }
 
-    private OAuthService createService() {
+    private OAuthService createService(URL currentUrl) {
         ServiceBuilder sb = new ServiceBuilder();
         sb.provider(Google2Api.class);
         sb.apiKey(gpluskey);
         sb.apiSecret(gplussecret);
         sb.scope("email");
-        String callBackUrl = Page.getCurrent().getLocation().toString();
+        String callBackUrl = currentUrl.toString();
         if(callBackUrl.contains("#")) {
             callBackUrl = callBackUrl.substring(0, callBackUrl.indexOf("#"));
         }
         sb.callback(callBackUrl);
         return sb.build();
-    }
-
-    public LoginWindow() {
-        super("Login");
-        redirectUrl = Page.getCurrent().getLocation().toString();
-
     }
 
     @Override

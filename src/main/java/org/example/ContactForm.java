@@ -1,27 +1,31 @@
 package org.example;
 
-import com.vaadin.ui.Component;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.TextField;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import org.example.backend.Contact;
-import org.vaadin.viritin.fields.MTextField;
-import org.vaadin.viritin.form.AbstractForm;
-import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
+import org.vaadin.firitin.components.textfield.VTextField;
+import org.vaadin.firitin.form.AbstractForm;
 
 public class ContactForm extends AbstractForm<Contact> {
 
-    TextField name = new MTextField("name");
+    TextField name = new VTextField("name");
 
-    TextField address1 = new MTextField("address1");
-    TextField address2 = new MTextField("address2");
-    TextField address3 = new MTextField("address3");
-    TextField phone = new MTextField("phone");
+    TextField address1 = new VTextField("address1");
+    TextField address2 = new VTextField("address2");
+    TextField address3 = new VTextField("address3");
+    TextField phone = new VTextField("phone");
 
-    TextField email = new MTextField("email");
+    TextField email = new VTextField("email");
+
+    public ContactForm() {
+        super(Contact.class);
+    }
 
     @Override
     protected Component createContent() {
-        return new MVerticalLayout(
+        return new VVerticalLayout(
                 new FormLayout(
                         name,
                         address1,

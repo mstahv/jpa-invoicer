@@ -1,50 +1,50 @@
 package org.example;
 
-import com.vaadin.cdi.ViewScoped;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.Window;
+import com.vaadin.cdi.annotation.RouteScoped;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import org.example.backend.Invoicer;
-import org.example.backend.User;
-import org.vaadin.easyuploads.UploadField;
-import org.vaadin.viritin.fields.ElementCollectionField;
-import org.vaadin.viritin.fields.MTextField;
-import org.vaadin.viritin.form.AbstractForm;
-import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
+import org.vaadin.firitin.components.textfield.VTextField;
+import org.vaadin.firitin.form.AbstractForm;
 
-@ViewScoped
+@RouteScoped
 public class InvoicerForm extends AbstractForm<Invoicer> {
 
-    TextField name = new MTextField("name");
+    TextField name = new VTextField("name");
 
-    TextField address = new MTextField("address");
+    TextField address = new VTextField("address");
 
-    TextField email = new MTextField("email");
+    TextField email = new VTextField("email");
 
-    TextField phone = new MTextField("phone");
+    TextField phone = new VTextField("phone");
 
-    TextField bankAccount = new MTextField("bankAccount");
+    TextField bankAccount = new VTextField("bankAccount");
 
-    TextField nextInvoiceNumber = new MTextField("next invoice number");
+    TextField nextInvoiceNumber = new VTextField("next invoice number");
 
-    UploadField template = new TemplateField();
+    public InvoicerForm() {
+        super(Invoicer.class);
+    }
+
+// TODO    UploadField template = new TemplateField();
 
     public static class UserRow {
 
-        MTextField email = new MTextField();
+        VTextField email = new VTextField();
     }
-
+/* TODO
     ElementCollectionField<User> administrators
             = new ElementCollectionField<>(User.class, UserRow.class)
             .expand("email")
             .withCaption("Users")
             .withFullWidth();
-
+*/
     @Override
     protected Component createContent() {
 
-        return new MVerticalLayout(
+        return new VVerticalLayout(
                 getToolbar(),
                 new FormLayout(
                         name,
@@ -52,19 +52,10 @@ public class InvoicerForm extends AbstractForm<Invoicer> {
                         phone,
                         email,
                         bankAccount,
-                        nextInvoiceNumber,
-                        template,
-                        administrators
+                        nextInvoiceNumber
+//                        template,
+//                        administrators
                 )
         );
     }
-
-    @Override
-    public Window openInModalPopup() {
-        final Window window = super.openInModalPopup();
-        window.setHeight("80%");
-        window.setWidth("50%");
-        return window;
-    }
-
 }

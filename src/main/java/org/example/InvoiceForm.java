@@ -1,28 +1,21 @@
 package org.example;
 
-import com.vaadin.cdi.ViewScoped;
-import com.vaadin.data.validator.AbstractValidator;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.Window;
+import com.vaadin.cdi.annotation.RouteScoped;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.html.H3;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import org.example.backend.Contact;
 import org.example.backend.Invoice;
-import org.example.backend.InvoiceRow;
 import org.example.backend.Product;
 import org.example.backend.service.ProductFacade;
-import org.vaadin.viritin.fields.ElementCollectionField;
-import org.vaadin.viritin.fields.MTextField;
-import org.vaadin.viritin.fields.TypedSelect;
-import org.vaadin.viritin.form.AbstractForm;
-import org.vaadin.viritin.label.Header;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.firitin.components.combobox.VComboBox;
+import org.vaadin.firitin.components.orderedlayout.VHorizontalLayout;
+import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
+import org.vaadin.firitin.components.textfield.VTextField;
+import org.vaadin.firitin.form.AbstractForm;
 
-@ViewScoped
+@RouteScoped
 public class InvoiceForm extends AbstractForm<Invoice> {
     
     @Inject
@@ -31,25 +24,29 @@ public class InvoiceForm extends AbstractForm<Invoice> {
     @Inject
     ProductFacade productFacade;
     
-    DateField invoiceDate = new DateField("Date");
+    DatePicker invoiceDate = new DatePicker("Date");
     
-    DateField dueDate = new DateField("Due Date");
+    DatePicker dueDate = new DatePicker("Due Date");
     
-    Header total = new Header("").setHeaderLevel(3);
-    
+    H3 total = new H3("");
+
+    public InvoiceForm() {
+        super(Invoice.class);
+    }
+
     public static final class RowEditorModel {
         
-        TypedSelect<Product> product = new TypedSelect<>(Product.class)
-                .withSelectType(ComboBox.class)
+        VComboBox<Product> product = new VComboBox<Product>()
                 .withWidth("150px")
-                .setInputPrompt("Pick a product");
-        MTextField description = new MTextField().withFullWidth();
-        MTextField quantity = new MTextField().withWidth("3em");
-        MTextField unit = new MTextField().withWidth("3em");
-        MTextField price = new MTextField().withWidth("3em");
+                .withPlaceholder("Pick a product");
+        VTextField description = new VTextField().withFullWidth();
+        VTextField quantity = new VTextField().withWidth("3em");
+        VTextField unit = new VTextField().withWidth("3em");
+        VTextField price = new VTextField().withWidth("3em");
         
     }
-    
+
+/* TODO    
     ElementCollectionField<InvoiceRow> invoiceRows = new ElementCollectionField<>(
             InvoiceRow.class, RowEditorModel.class).expand("description")
             .withEditorInstantiator(() -> {
@@ -67,10 +64,11 @@ public class InvoiceForm extends AbstractForm<Invoice> {
                 });
                 return r;
     });
-    
+*/    
     @PostConstruct
     void init() {
         // Allowing null in DB, but not when modified by the UI
+        /* TODO
         to.setRequired(true);
         to.addValidator(new AbstractValidator("Receiver must be set") {
             
@@ -85,19 +83,19 @@ public class InvoiceForm extends AbstractForm<Invoice> {
             }
         });
         invoiceRows.addValueChangeListener(e -> updateTotal());
+*/
     }
     
     @Override
     protected Component createContent() {
         
-        return new MVerticalLayout(
-                new MHorizontalLayout(getToolbar()).add(total,
-                        Alignment.MIDDLE_RIGHT)
-                .withFullWidth(),
-                new MVerticalLayout(
+        return new VVerticalLayout(
+                new VHorizontalLayout(getToolbar()).withComponent(total).withFullWidth(),
+                new VVerticalLayout(
                         to,
-                        new MHorizontalLayout(invoiceDate, dueDate),
-                        invoiceRows
+                        new VHorizontalLayout(invoiceDate, dueDate)
+                        // TODO,
+                        //invoiceRows
                 )
         );
     }
@@ -109,13 +107,5 @@ public class InvoiceForm extends AbstractForm<Invoice> {
             total.setText("--");
         }
     }
-    
-    @Override
-    public Window openInModalPopup() {
-        final Window p = super.openInModalPopup();
-        p.setWidth("80%");
-        p.setHeight("95%");
-        return p;
-    }
-    
+        
 }
