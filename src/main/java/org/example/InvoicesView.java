@@ -14,6 +14,7 @@ import org.example.backend.Invoice;
 import org.example.backend.UserSession;
 import org.example.backend.service.InvoiceFacade;
 import org.example.backend.service.InvoicerFacade;
+import org.vaadin.firitin.appframework.MenuItem;
 import org.vaadin.firitin.components.DynamicFileDownloader;
 import org.vaadin.firitin.components.button.DeleteButton;
 import org.vaadin.firitin.components.button.VButton;
@@ -21,7 +22,8 @@ import org.vaadin.firitin.components.grid.VGrid;
 import org.vaadin.firitin.components.orderedlayout.VHorizontalLayout;
 import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
 
-@Route
+@Route(layout = MainLayout.class)
+@MenuItem(order = MenuItem.END)
 public class InvoicesView extends VVerticalLayout {
 
     @Inject
@@ -44,7 +46,6 @@ public class InvoicesView extends VVerticalLayout {
             .withProperties("invoiceNumber", "to", "invoiceDate", "lastEdited",
                     "lastEditor");
             //.withColumnHeaders("Nr", "To", "Date", "Last edited", "Edited by")
-            //.withGeneratedColumn("actions", this::getInvoiceActions);
 
     DynamicFileDownloader backup = new DynamicFileDownloader("Download backup","backup.xml",
             out -> invoicerFacade.writeAsXml(sender.getValue(), out)
@@ -52,16 +53,14 @@ public class InvoicesView extends VVerticalLayout {
 
     @PostConstruct
     public void initComponent() {
-        /*
-        table.setColumnCollapsingAllowed(true);
-        table.setColumnWidth("invoiceDate", 105);
-        table.setColumnWidth("lastEdited", 105);
-        table.setColumnWidth("lastEditor", 110);
-         */
+        table.addComponentColumn(this::getInvoiceActions).setHeader("actions");
+        table.getColumnByKey("invoiceDate").setWidth("110px").setFlexGrow(0);
+        table.getColumnByKey("lastEdited").setWidth("110px").setFlexGrow(0);
+        table.getColumnByKey("lastEditor").setWidth("110px").setFlexGrow(0);
+
         if (session.getUser().getAdministrates().isEmpty()) {
             Notification.show("Add invoicer first!");
-            // TODO
-            //ViewMenuUI.getMenu().navigateTo(MyAccount.class);
+            getUI().get().navigate(MyAccount.class);
             return;
         }
         sender.addValueChangeListener(e -> listEntities());
@@ -69,21 +68,20 @@ public class InvoicesView extends VVerticalLayout {
         form.setResetHandler(this::reset);
         form.setSavedHandler(this::save);
 
-        /*
-        table.addMValueChangeListener(e -> {
-            if (e.getValue() != null) {
+        table.asSingleSelect().addValueChangeListener(e->{
+            if (e.getValue() != null && e.isFromClient()) {
                 form.setEntity(e.getValue());
-                form.openInModalPopup();
+                MainLayout.get().openSubView(form, "Edit invoice");
             }
+
         });
-        */
 
         listEntities();
 
         Button addButton = new Button("Add", e -> {
             final Invoice invoice = facade.createFor(sender.getValue());
             form.setEntity(invoice);
-            form.openInModalPopup();
+            MainLayout.get().openSubView(form, "Create invoice");
         });
 
         add(
@@ -94,7 +92,7 @@ public class InvoicesView extends VVerticalLayout {
         expand(table);
     }
 
-    public static final int DEFAULT_DUE_DATE_DURATION = 14 * 24 * 60 * 60 * 1000;
+    public static final int DEFAULT_DUE_DATE_DURATION = 14;
 
     private void listEntities() {
         table.setItems(facade.findAll(sender.getValue()));
@@ -137,13 +135,13 @@ public class InvoicesView extends VVerticalLayout {
     public void save(Invoice entity) {
         facade.save(entity);
         Notification.show("Saved!");
-        form.getPopup().close();
+        MainLayout.get().closeSubView(form);
         listEntities();
     }
 
     public void reset(Invoice entity) {
         // just hide the form
-        form.getPopup().close();
+        MainLayout.get().closeSubView(form);
         listEntities();
     }
 

@@ -7,6 +7,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -81,9 +83,8 @@ public class InvoiceFacade {
         Invoice invoice = new Invoice();
         invoice.setInvoiceNumber(invoicer.getAndIcrementNextInvoiceNumber());
         invoice.setInvoicer(invoicer);
-        invoice.setInvoiceDate(new Date());
-        invoice.setDueDate(new Date(
-                System.currentTimeMillis() + DEFAULT_DUE_DATE_DURATION));
+        invoice.setInvoiceDate(LocalDate.now());
+        invoice.setDueDate(LocalDate.now().plusDays(DEFAULT_DUE_DATE_DURATION));
         invoice.setLastEditor(session.getUser());
         invoicerRepo.save(invoicer);
         repo.save(invoice);

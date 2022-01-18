@@ -1,11 +1,16 @@
 
 package org.example;
 
-import javax.annotation.PostConstruct;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.router.Route;
+import org.vaadin.firitin.appframework.MenuItem;
 import org.vaadin.firitin.components.RichText;
 import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
 
-//@ViewMenuItem(icon = FontAwesome.LIFE_BOUY, order = ViewMenuItem.BEGINNING)
+import javax.annotation.PostConstruct;
+
+@MenuItem(icon = VaadinIcon.LIFEBUOY, order = MenuItem.BEGINNING)
+@Route(value = "", layout = MainLayout.class)
 public class AboutView extends VVerticalLayout /*implements View*/ {
     
     @PostConstruct

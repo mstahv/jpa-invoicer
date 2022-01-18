@@ -2,6 +2,7 @@ package org.example;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.Route;
 import javax.annotation.PostConstruct;
@@ -9,12 +10,13 @@ import javax.inject.Inject;
 import org.example.backend.Invoicer;
 import org.example.backend.UserSession;
 import org.example.backend.service.InvoicerFacade;
+import org.vaadin.firitin.appframework.MenuItem;
 import org.vaadin.firitin.components.RichText;
 import org.vaadin.firitin.components.grid.VGrid;
 import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
 
-@Route
-//@ViewMenuItem(icon = FontAwesome.LIFE_BOUY, order = ViewMenuItem.END)
+@Route(layout = MainLayout.class)
+@MenuItem(icon = VaadinIcon.LIFEBUOY, order = MenuItem.END)
 public class MyAccount extends VVerticalLayout {
 
     @Inject

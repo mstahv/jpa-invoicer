@@ -6,6 +6,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.Route;
 import org.example.backend.Product;
 import org.example.backend.service.ProductFacade;
+import org.vaadin.firitin.appframework.MenuItem;
 import org.vaadin.firitin.components.grid.VGrid;
 import org.vaadin.firitin.components.orderedlayout.VHorizontalLayout;
 import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
@@ -17,7 +18,8 @@ import javax.inject.Inject;
  *
  * @author Mortoza Khan
  */
-@Route
+@Route(layout = MainLayout.class)
+@MenuItem(title = "Products", order = MenuItem.END)
 public class ProductView extends VVerticalLayout {
 
     @Inject

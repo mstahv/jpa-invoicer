@@ -1,10 +1,18 @@
 package org.example;
 
 import com.vaadin.cdi.annotation.RouteScoped;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.shared.Registration;
+import org.checkerframework.checker.units.qual.C;
 import org.example.backend.Contact;
 import org.example.backend.service.ContactFacade;
 import org.vaadin.firitin.components.button.VButton;
@@ -16,8 +24,9 @@ import org.vaadin.firitin.components.orderedlayout.VHorizontalLayout;
  * @author Matti Tahvonen
  */
 @RouteScoped
-public class ContactSelector extends ComboBox<Contact> {
-    protected static final int PAGE_SIZE = 15;
+public class ContactSelector extends Composite<HorizontalLayout> implements HasValue<HasValue.ValueChangeEvent<Contact>, Contact> {
+
+    ComboBox<Contact> comboBox = new ComboBox<>();
 
     @Inject
     private ContactFacade contactFacade;
@@ -33,39 +42,31 @@ public class ContactSelector extends ComboBox<Contact> {
 
     @PostConstruct
     void init() {
-        /* TODO
-        initList(Contact.class,
-                (int firstRow, String filter) -> contactFacade.findPaged(
-                        invoicerSelect.getValue(), 
-                        filter,
-                        firstRow, 
-                        PAGE_SIZE),
-                (String filter) -> contactFacade.countContacts(
-                        invoicerSelect.getValue(), 
-                        filter),
-                PAGE_SIZE);
-*/
         updatelist();
         edit.setEnabled(false);
-        addValueChangeListener(e -> edit.setEnabled(
+        comboBox.addValueChangeListener(e -> edit.setEnabled(
                 getValue() != null));
 
-//        invoicerSelect.addMValueChangeListener(e -> updatelist());
+        invoicerSelect.addValueChangeListener(e->updatelist());
 
-        setLabel("Customer");
+        comboBox.setLabel("Customer");
 
-        /* TODO
-        getSelect().setNewItemHandler(this);
-        getSelect().setNewItemsAllowed(true);
-        */
-        setWidth("300px");
-        setPlaceholder("Type new or choose existing");
+        comboBox.addCustomValueSetListener(e -> addNewItem(e.getDetail()));
+        comboBox.setPlaceholder("Type new or choose existing");
 
     }
 
     void updatelist() {
-        // TODO
-        //refresh();
+
+        comboBox.setItems(contactFacade.findAll(invoicerSelect.getValue()));
+        /* Can't use lazy loading :-( https://github.com/vaadin/flow-components/issues/2524
+        comboBox.setItems(lc -> contactFacade.findPaged(
+                invoicerSelect.getValue(),
+                lc.getFilter().get(),
+                lc.getOffset(),
+                lc.getLimit()
+        ).stream());
+         */
     }
 
 //    @Override
@@ -73,18 +74,18 @@ public class ContactSelector extends ComboBox<Contact> {
         // make contact with detail
         Contact contact = new Contact();
         contact.setName(newItemCaption);
-//        contact.setInvoicer(invoicerSelect.getValue());
+        contact.setInvoicer(invoicerSelect.getValue());
         form.setEntity(contact);
         form.setSavedHandler(entity -> {
-            contactFacade.save(entity);
-            form.getPopup().close();
+            entity = contactFacade.save(entity);
+            MainLayout.get().closeSubView(form);
             updatelist();
             setValue(entity);
         });
         form.setResetHandler(e -> {
-            form.getPopup().close();
+            MainLayout.get().closeSubView(form);
         });
-  //      form.openInModalPopup().setCaption("Add new customer");
+        MainLayout.get().openSubView(form, "Edit new customer");
         form.getSaveButton().setEnabled(true); // new item
     }
 
@@ -92,21 +93,53 @@ public class ContactSelector extends ComboBox<Contact> {
         form.setEntity(contactFacade.refresh(getValue()));
         form.setSavedHandler(entity -> {
             contactFacade.save(entity);
-            form.getPopup().close();
+            MainLayout.get().closeSubView(form);
             updatelist();
             setValue(entity);
         });
         form.setResetHandler(e -> {
-            form.getPopup().close();
+            MainLayout.get().closeSubView(form);
         });
-    //    form.openInModalPopup().setCaption("Edit customer");
-
+        MainLayout.get().openSubView(form, "Edit existing customer");
     }
 
-//    @Override
-//    protected Component initContent() {
-//        final Component compositionRoot = super.initContent();
-//        return new VHorizontalLayout(compositionRoot, edit);
-//    }
-    
+    @Override
+    protected HorizontalLayout initContent() {
+        return new VHorizontalLayout(comboBox, edit).alignAll(FlexComponent.Alignment.BASELINE);
+    }
+
+    @Override
+    public void setValue(Contact value) {
+        comboBox.setValue(value);
+    }
+
+    @Override
+    public Contact getValue() {
+        return comboBox.getValue();
+    }
+
+    @Override
+    public Registration addValueChangeListener(ValueChangeListener<? super ValueChangeEvent<Contact>> listener) {
+        return comboBox.addValueChangeListener(listener);
+    }
+
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        comboBox.setReadOnly(readOnly);
+    }
+
+    @Override
+    public boolean isReadOnly() {
+        return comboBox.isReadOnly();
+    }
+
+    @Override
+    public void setRequiredIndicatorVisible(boolean requiredIndicatorVisible) {
+        comboBox.setRequiredIndicatorVisible(requiredIndicatorVisible);
+    }
+
+    @Override
+    public boolean isRequiredIndicatorVisible() {
+        return comboBox.isRequiredIndicatorVisible();
+    }
 }

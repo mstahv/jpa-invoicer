@@ -1,5 +1,6 @@
 package org.example.backend;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +18,6 @@ import javax.xml.bind.annotation.XmlTransient;
 public class Invoice extends AbstractEntity {
 
     public static enum Status {
-
         InProgress, Sent, Received
     }
 
@@ -34,16 +34,13 @@ public class Invoice extends AbstractEntity {
     private User lastEditor;
 
     @NotNull
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastEdited;
+    private LocalDate lastEdited;
 
     @NotNull
-    @Temporal(TemporalType.DATE)
-    private Date invoiceDate;
+    private LocalDate invoiceDate;
 
     @NotNull
-    @Temporal(TemporalType.DATE)
-    private Date dueDate;
+    private LocalDate dueDate;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<InvoiceRow> invoiceRows = new ArrayList<>();
@@ -54,14 +51,14 @@ public class Invoice extends AbstractEntity {
 
     public void setLastEditor(User lastEditor) {
         this.lastEditor = lastEditor;
-        lastEdited = new Date();
+        lastEdited = LocalDate.now();
     }
 
-    public Date getLastEdited() {
+    public LocalDate getLastEdited() {
         return lastEdited;
     }
 
-    public void setLastEdited(Date lastEdited) {
+    public void setLastEdited(LocalDate lastEdited) {
         this.lastEdited = lastEdited;
     }
 
@@ -127,19 +124,19 @@ public class Invoice extends AbstractEntity {
         this.to = to;
     }
 
-    public Date getInvoiceDate() {
+    public LocalDate getInvoiceDate() {
         return invoiceDate;
     }
 
-    public void setInvoiceDate(Date invoiceDate) {
+    public void setInvoiceDate(LocalDate invoiceDate) {
         this.invoiceDate = invoiceDate;
     }
 
-    public Date getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
