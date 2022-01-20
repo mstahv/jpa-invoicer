@@ -2,7 +2,11 @@ package org.example.backend.service;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+
+import org.example.backend.Invoicer;
 import org.example.backend.User;
+
+import java.util.List;
 
 /**
  *
@@ -16,7 +20,10 @@ public class UserFacade {
 
     public User findByEmail(String email) {
         try {
-            return repo.findByEmail(email);
+            User user = repo.findByEmail(email);
+            System.out.println(user.getAdministrates());
+            user.getAdministrates().size();
+            return user;
         } catch (Exception e) {
             return null;
         }

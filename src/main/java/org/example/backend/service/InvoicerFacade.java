@@ -1,6 +1,7 @@
 package org.example.backend.service;
 
 import java.io.OutputStream;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -82,4 +83,7 @@ public class InvoicerFacade {
         return in;
     }
 
+    public List<Invoicer> findFor(User user) {
+        return repository.findFor(user);
+    }
 }

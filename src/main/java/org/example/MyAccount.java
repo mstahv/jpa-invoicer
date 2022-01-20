@@ -58,7 +58,7 @@ public class MyAccount extends VVerticalLayout {
     }
 
     private void listEntities() {
-        table.setItems(session.getUser().getAdministrates());
+        table.setItems(session.getInvoicers());
     }
 
     private void editEntity(Invoicer invoicer) {
@@ -68,7 +68,7 @@ public class MyAccount extends VVerticalLayout {
                 invoicer = cf.findJoined(invoicer.getId());
             }
             form.setEntity(invoicer);
-            form.openInModalPopup();
+            MainLayout.get().openSubView(form, "Edit invoicer/organization");
         }
     }
 
@@ -87,13 +87,13 @@ public class MyAccount extends VVerticalLayout {
                     //Notification.Type.WARNING_MESSAGE
             );
         }
+        MainLayout.get().closeSubView(form);
         listEntities();
-        form.getPopup().close();
     }
 
     public void reset(Invoicer entity) {
         // just hide the form
-        form.getPopup().close();
+        MainLayout.get().closeSubView(form);
     }
 
 }

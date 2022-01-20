@@ -1,6 +1,8 @@
 package org.example.backend;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
@@ -51,6 +53,12 @@ public class UserSession implements Serializable {
             invoicer.setEmail("matti@pumppu.fi");
             invoicer.setPhone("+34567890");
             invoicer.getAdministrators().add(this.user);
+            try {
+                invoicer.setTemplate(Invoice.class.getResourceAsStream("/tmpl.odt").readAllBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             this.user.getAdministrates().add(invoicer);
             invoicer = invoicerFacade.save(invoicer);
             Product product = new Product();
@@ -90,4 +98,7 @@ public class UserSession implements Serializable {
         }
     }
 
+    public List<Invoicer> getInvoicers() {
+        return invoicerFacade.findFor(user);
+    }
 }

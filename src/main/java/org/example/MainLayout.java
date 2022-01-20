@@ -18,7 +18,7 @@ public class MainLayout extends org.vaadin.firitin.appframework.MainLayout {
     }
 
     @Override
-    protected Component[] getDrawerHeader() {
-        return new Component[]{new H3("Invoices")};
+    protected String getDrawerHeader() {
+        return "Invoices";
     }
 }

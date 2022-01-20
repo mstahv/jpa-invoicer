@@ -11,7 +11,7 @@ import javax.annotation.PostConstruct;
 
 @MenuItem(icon = VaadinIcon.LIFEBUOY, order = MenuItem.BEGINNING)
 @Route(value = "", layout = MainLayout.class)
-public class AboutView extends VVerticalLayout /*implements View*/ {
+public class AboutView extends VVerticalLayout {
     
     @PostConstruct
     void init() {

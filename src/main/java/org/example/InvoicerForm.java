@@ -63,6 +63,10 @@ public class InvoicerForm extends AbstractForm<Invoicer> {
 
         // TODO add API to configure template field
 
+        template.setUploadCaption("Upload new template");
+        template.setFileDownloadText("Download current template ( %s )");
+        template.setDownloadFileName("template.odt");
+
         return new VVerticalLayout(
                 getToolbar(),
                 new FormLayout(
@@ -72,6 +76,7 @@ public class InvoicerForm extends AbstractForm<Invoicer> {
                         email,
                         bankAccount,
                         nextInvoiceNumber,
+                        administrators,
                         template,
                         administrators
                 )
