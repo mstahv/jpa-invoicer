@@ -13,7 +13,6 @@ import org.vaadin.firitin.components.textfield.VTextField;
 import org.vaadin.firitin.fields.ByteArrayUploadField;
 import org.vaadin.firitin.fields.ElementCollectionField;
 import org.vaadin.firitin.form.AbstractForm;
-import org.vaadin.stefan.table.TableRow;
 
 @RouteScoped
 public class InvoicerForm extends AbstractForm<Invoicer> {
@@ -36,18 +35,8 @@ public class InvoicerForm extends AbstractForm<Invoicer> {
 
     ByteArrayUploadField template = new ByteArrayUploadField();
 
-    public static class UserEditor extends AbstractForm<User> {
-
+    public static class UserEditor {
         VTextField email = new VTextField();
-
-        public UserEditor() {
-            super(User.class);
-        }
-
-        @Override
-        protected Component createContent() {
-            return new TableRow(email);
-        }
     }
 
     ElementCollectionField<User> administrators = new ElementCollectionField<>(User.class, UserEditor.class);

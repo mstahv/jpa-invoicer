@@ -20,7 +20,6 @@ import org.vaadin.firitin.components.textfield.VNumberField;
 import org.vaadin.firitin.components.textfield.VTextField;
 import org.vaadin.firitin.fields.ElementCollectionField;
 import org.vaadin.firitin.form.AbstractForm;
-import org.vaadin.stefan.table.TableRow;
 
 @RouteScoped
 public class InvoiceForm extends AbstractForm<Invoice> {
@@ -41,8 +40,7 @@ public class InvoiceForm extends AbstractForm<Invoice> {
         super(Invoice.class);
     }
 
-    public static final class RowEditor extends AbstractForm<InvoiceRow> {
-        
+    public static final class RowEditor {
         VComboBox<Product> product = new VComboBox<Product>()
                 .withWidth("150px")
                 .withPlaceholder("Pick a product");
@@ -50,17 +48,6 @@ public class InvoiceForm extends AbstractForm<Invoice> {
         VNumberField quantity = new VNumberField().withWidth("3em");
         VTextField unit = new VTextField().withWidth("3em");
         VNumberField price = new VNumberField().withWidth("3em");
-
-        public RowEditor() {
-            super(InvoiceRow.class);
-        }
-
-        @Override
-        protected Component createContent() {
-            TableRow tr = new TableRow();
-            tr.addCells(product, description, quantity, unit, price);
-            return tr;
-        }
     }
 
     ElementCollectionField<InvoiceRow> invoiceRows = new ElementCollectionField<>(
