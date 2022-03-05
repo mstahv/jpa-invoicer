@@ -130,7 +130,7 @@ public class InvoicesView extends VVerticalLayout {
                 })
                 .withConfirmationPrompt("Are you sure you want to delete this invoice");
 
-        deleteButton.getContent().addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
 
         actions.add(deleteButton);
         actions.alignAll(Alignment.CENTER);

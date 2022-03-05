@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.shared.Registration;
-import org.checkerframework.checker.units.qual.C;
 import org.example.backend.Contact;
 import org.example.backend.service.ContactFacade;
 import org.vaadin.firitin.components.button.VButton;
