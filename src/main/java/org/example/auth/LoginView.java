@@ -3,20 +3,16 @@ package org.example.auth;
 import com.google.gson.Gson;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Page;
-import com.vaadin.flow.router.Router;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.*;
 
 import java.io.IOException;
 import java.net.URL;
 import javax.inject.Inject;
 
-import com.vaadin.flow.theme.lumo.Lumo;
 import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.example.backend.UserSession;
 import org.scribe.builder.ServiceBuilder;
@@ -32,9 +28,10 @@ import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
  *
  * @author Matti Tahvonen
  */
-public class LoginWindow extends Dialog implements RequestHandler {
+@Route
+public class LoginView extends VVerticalLayout implements RequestHandler {
 
-    private Anchor gplusLoginButton;
+    private Anchor googleLoginButton;
 
     OAuthService service;
 
@@ -46,21 +43,26 @@ public class LoginWindow extends Dialog implements RequestHandler {
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
 
+        if(userSession.isLoggedIn()) {
+            UI.getCurrent().navigate("");
+            return;
+        }
+
+
         UI.getCurrent().getPage().fetchCurrentURL(currentUrl -> {
+
             redirectUrl = currentUrl.toString();
             service = createService(currentUrl);
             String url = service.getAuthorizationUrl(null);
 
-            gplusLoginButton = new Anchor(url, "Login with Google");
+            googleLoginButton = new Anchor(url, "Login with Google");
             //TODO gplusLoginButton.addStyleName(ValoTheme.LINK_LARGE);
 
             VaadinSession.getCurrent().addRequestHandler(this);
 
-            add(new VVerticalLayout(gplusLoginButton)
-                    .alignAll(FlexComponent.Alignment.CENTER).withFullHeight());
-            setModal(true);
-            setWidth("300px");
-            setHeight("200px");
+            add(googleLoginButton);
+            alignAll(FlexComponent.Alignment.CENTER).withFullHeight();
+
         });
 
     }
@@ -74,8 +76,8 @@ public class LoginWindow extends Dialog implements RequestHandler {
     private OAuthService createService(URL currentUrl) {
         ServiceBuilder sb = new ServiceBuilder();
         sb.provider(Google2Api.class);
-        sb.apiKey(gpluskey);
-        sb.apiSecret(gplussecret);
+        sb.apiKey(googleAppkey);
+        sb.apiSecret(googleAppSecret);
         sb.scope("email");
         String callBackUrl = currentUrl.toString();
         if(callBackUrl.contains("#")) {
@@ -90,21 +92,27 @@ public class LoginWindow extends Dialog implements RequestHandler {
             VaadinResponse response) throws IOException {
         if (request.getParameter("code") != null) {
             String code = request.getParameter("code");
+
             Verifier v = new Verifier(code);
+
             Token t = service.getAccessToken(null, v);
 
             OAuthRequest r = new OAuthRequest(Verb.GET,
-                    "https://www.googleapis.com/plus/v1/people/me");
+                    "https://www.googleapis.com/oauth2/v3/userinfo");
             service.signRequest(t, r);
             Response resp = r.send();
 
-            GooglePlusAnswer answer = new Gson().fromJson(resp.getBody(),
-                    GooglePlusAnswer.class);
+            String body = resp.getBody();
+            //System.out.println(body);
+            GoogleUserinfo answer = new Gson().fromJson(body, GoogleUserinfo.class);
 
-            userSession.login(answer.emails[0].value, answer.displayName);
+            userSession.login(answer.email, answer.picture);
 
-            close();
-            VaadinSession.getCurrent().removeRequestHandler(this);
+            getUI().ifPresent(ui ->
+                ui.access(() -> {
+                    VaadinSession.getCurrent().removeRequestHandler(this);
+                })
+            );
 
             ((VaadinServletResponse) response).getHttpServletResponse().
                     sendRedirect(redirectUrl);
@@ -115,11 +123,11 @@ public class LoginWindow extends Dialog implements RequestHandler {
     }
 
     @Inject
-    @ConfigProperty(name = "jpa-invoicer.gpluskey")
-    private String gpluskey;
+    @ConfigProperty(name = "jpa-invoicer.gappkey")
+    private String googleAppkey;
 
     @Inject
-    @ConfigProperty(name = "jpa-invoicer.gplussecret")
-    private String gplussecret;
+    @ConfigProperty(name = "jpa-invoicer.gappsecret")
+    private String googleAppSecret;
 
 }

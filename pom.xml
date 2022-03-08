@@ -13,9 +13,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <!-- Your key and secret here, to profile or to elsewhere so that it
-        is available for delta spike properties.        -->
-        <jpa-invoicer.gpluskey></jpa-invoicer.gpluskey>
-        <jpa-invoicer.gplussecret></jpa-invoicer.gplussecret>
+        is available for delta spike properties.-->
+        <jpa-invoicer.gappkey></jpa-invoicer.gappkey>
+        <jpa-invoicer.gappsecret></jpa-invoicer.gappsecret>
         <jpa-invoicer.smtp.hostname>localhost</jpa-invoicer.smtp.hostname>
         <jpa-invoicer.smtp.port>9090</jpa-invoicer.smtp.port>
         <jpa-invoicer.smtp.from>invoicer@vaadin.com</jpa-invoicer.smtp.from>

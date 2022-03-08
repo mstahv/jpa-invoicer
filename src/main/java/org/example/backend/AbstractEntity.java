@@ -56,5 +56,4 @@ public abstract class AbstractEntity implements Serializable, Cloneable {
         hash = 43 * hash + Objects.hashCode(this.id);
         return hash;
     }
-    
 }

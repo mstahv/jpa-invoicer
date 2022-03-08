@@ -6,13 +6,10 @@
 
 package org.example.auth;
 
-/**
- *
- * @author mstahv
- */
-public class GooglePlusAnswer {
+public class GoogleUserinfo {
 
-    GooglePlusEmail[] emails;
-    String displayName;
-    
+    String email;
+    String picture;
+    boolean email_verified;
+
 }

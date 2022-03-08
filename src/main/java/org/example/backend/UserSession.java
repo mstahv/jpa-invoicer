@@ -6,8 +6,13 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
+
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.server.VaadinSession;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.deltaspike.core.api.config.ConfigResolver;
+import org.example.auth.LoginView;
 import org.example.backend.service.InvoicerFacade;
 import org.example.backend.service.ProductFacade;
 import org.example.backend.service.UserFacade;
@@ -29,11 +34,12 @@ public class UserSession implements Serializable {
     ProductFacade productFacade;
 
     private User user;
+    private String image;
 
     @PostConstruct
     public void init() {
         final String propertyValue = ConfigResolver.getPropertyValue(
-                "jpa-invoicer.gpluskey");
+                "jpa-invoicer.gappkey");
         // If no Google OAuth API key available, use fake login
         if (StringUtils.isEmpty(propertyValue)) {
             demoLogin();
@@ -87,9 +93,10 @@ public class UserSession implements Serializable {
         return user != null;
     }
 
-    public void login(String email, String displayName) {
+    public void login(String email, String image) {
         try {
             user = userFacade.findByEmail(email);
+            this.image = image;
         } catch (Exception e) {
         }
         if (user == null) {
@@ -100,5 +107,15 @@ public class UserSession implements Serializable {
 
     public List<Invoicer> getInvoicers() {
         return invoicerFacade.findFor(user);
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void logout() {
+        UI.getCurrent().getPage().setLocation("https://google.com/");
+        VaadinSession.getCurrent().close();
+        VaadinSession.getCurrent().getSession().invalidate();
     }
 }

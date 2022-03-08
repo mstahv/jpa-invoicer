@@ -41,7 +41,7 @@ public class Google2Api extends DefaultApi20 {
             public Token extract(String response) {
                 Preconditions.checkEmptyString(response, "Response body is incorrect. Can't extract a token from an empty string");
  
-                Matcher matcher = Pattern.compile("\"access_token\" : \"([^&\"]+)\"").matcher(response);
+                Matcher matcher = Pattern.compile("\"access_token\"\s*:\s*\"([^&\"]+)\"").matcher(response);
                 if (matcher.find())
                 {
                   String token = OAuthEncoder.decode(matcher.group(1));
