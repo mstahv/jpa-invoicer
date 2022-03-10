@@ -56,7 +56,6 @@ public class LoginView extends VVerticalLayout implements RequestHandler {
             String url = service.getAuthorizationUrl(null);
 
             googleLoginButton = new Anchor(url, "Login with Google");
-            //TODO gplusLoginButton.addStyleName(ValoTheme.LINK_LARGE);
 
             VaadinSession.getCurrent().addRequestHandler(this);
 
@@ -80,9 +79,8 @@ public class LoginView extends VVerticalLayout implements RequestHandler {
         sb.apiSecret(googleAppSecret);
         sb.scope("email");
         String callBackUrl = currentUrl.toString();
-        if(callBackUrl.contains("#")) {
-            callBackUrl = callBackUrl.substring(0, callBackUrl.indexOf("#"));
-        }
+        // strip away all views / parameters
+        callBackUrl = callBackUrl.substring(0, callBackUrl.lastIndexOf("/")) + "/";
         sb.callback(callBackUrl);
         return sb.build();
     }

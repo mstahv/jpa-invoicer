@@ -1,15 +1,12 @@
 package org.example;
 
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.Span;
-import org.example.auth.LoginView;
 import org.example.backend.UserSession;
-import org.vaadin.firitin.appframework.NavigationItem;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -26,14 +23,6 @@ public class MainLayout extends org.vaadin.firitin.appframework.MainLayout {
 
     public MainLayout() {
 
-    }
-
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
-        if(!session.isLoggedIn()) {
-            getUI().ifPresent(ui -> ui.navigate(LoginView.class));
-        }
     }
 
     @Override
