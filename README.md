@@ -11,7 +11,7 @@ Features:
  * Customer registry, used fluently via invoice view
  * PDF/ODT export for invoices, configurable ODT template
  * User backups via XML export
-* Google OAuth2 based login (pending upgrad from Vaadin 7 version)
+ * Google OAuth2 based login
 
 This is a suitable basis for small to medium sized apps. For larger applications,
 consider using MVP to structure your UI code. See e.g. [this example 
