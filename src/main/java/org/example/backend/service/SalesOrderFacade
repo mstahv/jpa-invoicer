@@ -1,0 +1,53 @@
+package org.example.backend.service;
+
+import java.util.Date;
+import java.util.List;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import org.example.backend.Invoicer;
+import org.example.backend.SalesOrder;
+import org.example.backend.UserSession;
+
+/**
+ * 18 Sep 2015
+ * @author Matti Tahvonen, Mortoza Khan
+ */
+@Stateless
+public class SalesOrderFacade {
+
+    @Inject
+    SalesOrderRepository repo;
+
+    @Inject
+    InvoicerRepository invoicerRepo;
+
+    public List<SalesOrder> findAll(Invoicer value) {
+        return repo.findAll();
+    }
+
+    public SalesOrder createFor(Invoicer invoicer) {
+        invoicer = invoicerRepo.findBy(invoicer.getId());
+        SalesOrder salesOrder = new SalesOrder();
+        salesOrder.setOrderNumber(invoicer.getAndIcrementNextOrderNumber());
+        salesOrder.setInvoicer(invoicer);
+        salesOrder.setOrderDate(new Date());
+        salesOrder.setLastEditor(session.getUser());
+        invoicerRepo.save(invoicer);
+        repo.save(salesOrder);
+        return salesOrder;
+    }
+
+    @Inject
+    UserSession session;
+
+    public SalesOrder save(SalesOrder entity) {
+        entity.setLastEditor(session.getUser());
+        return repo.save(entity);
+    }
+
+
+    public void remove(SalesOrder salesOrder) {
+        repo.remove(repo.findBy(salesOrder.getId()));
+    }
+
+}

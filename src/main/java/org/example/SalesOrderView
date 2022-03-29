@@ -1,0 +1,122 @@
+package org.example;
+
+import com.vaadin.cdi.CDIView;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.themes.ValoTheme;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import org.example.backend.SalesOrder;
+import org.example.backend.UserSession;
+import org.example.backend.service.InvoicerFacade;
+import org.example.backend.service.SalesOrderFacade;
+import org.vaadin.cdiviewmenu.ViewMenuUI;
+import org.vaadin.viritin.button.ConfirmButton;
+import org.vaadin.viritin.button.DownloadButton;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.fields.MTable;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
+@CDIView("salesOrder")
+public class SalesOrderView extends MVerticalLayout implements View {
+
+    @Inject
+    SalesOrderFacade facade;
+
+    @Inject
+    InvoicerFacade invoicerFacade;
+
+    @Inject
+    UserSession session;
+
+    @Inject
+    SalesOrderForm form;
+
+    @Inject
+    InvoicerSelect sender;
+
+    MTable<SalesOrder> table = new MTable<>(SalesOrder.class)
+            .withFullWidth()
+            .withProperties("orderNumber", "to", "orderDate", "lastEdited",
+                    "lastEditor","orderReference")
+            .withColumnHeaders("Nr", "To", "Date", "Last edited", "Edited by", "Order Reference")
+            .withGeneratedColumn("actions", this::getSalesOrderActions);
+
+    @PostConstruct
+    public void initComponent() {
+        table.setColumnCollapsingAllowed(true);
+        table.setColumnWidth("orderDate", 105);
+        table.setColumnWidth("lastEdited", 105);
+        table.setColumnWidth("lastEditor", 110);
+        if (session.getUser().getAdministrates().isEmpty()) {
+            Notification.show("Add invoicer first!");
+            ViewMenuUI.getMenu().navigateTo(MyAccount.class);
+            return;
+        }
+        sender.addMValueChangeListener(e -> listEntities());
+
+        form.setResetHandler(this::reset);
+        form.setSavedHandler(this::save);
+
+        table.addMValueChangeListener(e -> {
+            if (e.getValue() != null) {
+                form.setEntity(e.getValue());
+                form.openInModalPopup();
+            }
+        });
+
+        listEntities();
+
+        Button addButton = new Button("Add", e -> {
+            final SalesOrder salesOrder = facade.createFor(sender.getValue());
+            form.setEntity(salesOrder);
+            form.openInModalPopup();
+        });
+        expand(table);
+    }
+
+    public static final int DEFAULT_DUE_DATE_DURATION = 14 * 24 * 60 * 60 * 1000;
+
+    private void listEntities() {
+        table.setBeans(facade.findAll(sender.getValue()));
+    }
+
+    public MHorizontalLayout getSalesOrderActions(SalesOrder salesOrder) {
+        final MHorizontalLayout actions = new MHorizontalLayout();
+
+        final MButton deleteButton = new ConfirmButton(
+                FontAwesome.TRASH_O,
+                "Are you sure you want to delete this invoice",
+                e -> {
+                    facade.remove(salesOrder);
+                    listEntities();
+                }
+        ).withStyleName(ValoTheme.BUTTON_ICON_ONLY);
+        actions.add(deleteButton);
+        return actions;
+    }
+
+    public void save(SalesOrder entity) {
+        facade.save(entity);
+        Notification.show("Saved!");
+        form.getPopup().close();
+        listEntities();
+    }
+
+    public void reset(SalesOrder entity) {
+        // just hide the form
+        form.getPopup().close();
+        listEntities();
+    }
+
+    @Override
+    public
+            void enter(ViewChangeListener.ViewChangeEvent event) {
+    }
+
+}

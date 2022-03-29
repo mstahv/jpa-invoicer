@@ -1,0 +1,121 @@
+package org.example.backend;
+
+import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+/**
+ * 18 Sep 2015
+ * @author Matti Tahvonen,  Mortoza Khan
+ */
+@Entity
+public class SalesOrderRow extends AbstractEntity {
+
+    
+    @ManyToOne
+    private Product product;
+
+    @NotNull
+    private String description;
+
+    @NotNull
+    @Temporal(TemporalType.DATE)
+    private Date requestShipDate;
+ 
+    @Min(0)
+    @NotNull
+    private Double quantity = 1.0;
+
+    @NotNull
+    private String unit = "h";
+
+    @Min(0)
+    @NotNull
+    private Double price = 1.0;
+
+    @ManyToOne
+    private SalesOrder salesOrder;
+
+    public SalesOrder getSalesOrder() {
+        return salesOrder;
+    }
+
+    public void setSalesOrder(SalesOrder salesOrder) {
+        this.salesOrder = salesOrder;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public Double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Date getRequestShipDate() {
+        return requestShipDate;
+    }
+
+    public void setRequestShipDate(Date requestShipDate) {
+        this.requestShipDate = requestShipDate;
+    }
+
+   
+
+    
+    /**
+     * Get the value of description
+     *
+     * @return the value of description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Set the value of description
+     *
+     * @param description new value of description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Double getRowtotal() {
+        if (price == null || quantity == null) {
+            return 0.0;
+        } else {
+            return price * quantity;
+        }
+    }
+
+}
