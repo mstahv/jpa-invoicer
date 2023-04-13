@@ -11,7 +11,7 @@ import com.vaadin.flow.server.*;
 
 import java.io.IOException;
 import java.net.URL;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.example.backend.UserSession;

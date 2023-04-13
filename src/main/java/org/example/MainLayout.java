@@ -8,7 +8,7 @@ import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.Span;
 import org.example.backend.UserSession;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Optional;
 
 public class MainLayout extends org.vaadin.firitin.appframework.MainLayout {

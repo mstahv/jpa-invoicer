@@ -13,9 +13,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.mail.util.ByteArrayDataSource;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
+import jakarta.mail.util.ByteArrayDataSource;
 
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
@@ -202,7 +202,8 @@ public class InvoiceFacade {
             email.addTo(invoice.getInvoicer().getEmail());
             email.setSubject(smtpSubject);
             email.setMsg(smtpMessage);
-            email.attach(dataSource, fileName, "Invoice");
+            // TODO FIGURE OUT WHAT IS WRONG HERE
+//            email.attach(dataSource, fileName, "Invoice");
             email.send();
         }
     }

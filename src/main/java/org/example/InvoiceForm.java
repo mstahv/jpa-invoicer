@@ -4,8 +4,8 @@ import com.vaadin.cdi.annotation.RouteScoped;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.H3;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
 
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import org.example.backend.Invoice;

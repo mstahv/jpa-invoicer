@@ -6,8 +6,8 @@
 package org.example.backend.service;
 
 import java.util.List;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import org.example.backend.Invoicer;
 import org.example.backend.Product;
 import org.example.backend.Product.State;

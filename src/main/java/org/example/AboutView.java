@@ -7,7 +7,7 @@ import org.vaadin.firitin.appframework.MenuItem;
 import org.vaadin.firitin.components.RichText;
 import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 @MenuItem(icon = VaadinIcon.LIFEBUOY, order = MenuItem.BEGINNING)
 @Route(value = "", layout = MainLayout.class)
