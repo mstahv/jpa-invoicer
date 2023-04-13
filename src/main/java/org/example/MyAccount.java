@@ -1,5 +1,6 @@
 package org.example;
 
+import com.vaadin.cdi.annotation.CdiComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -17,6 +18,7 @@ import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
 
 @Route(layout = MainLayout.class)
 @MenuItem(icon = VaadinIcon.LIFEBUOY, order = MenuItem.END)
+@CdiComponent
 public class MyAccount extends VVerticalLayout {
 
     @Inject
@@ -25,8 +27,7 @@ public class MyAccount extends VVerticalLayout {
     @Inject
     UserSession session;
 
-    @Inject
-    InvoicerForm form;
+    InvoicerForm form = new InvoicerForm();
 
     VGrid<Invoicer> table = new VGrid<>(Invoicer.class)
             .withProperties("id", "name", "email");

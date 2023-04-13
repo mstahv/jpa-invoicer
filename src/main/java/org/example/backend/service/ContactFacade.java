@@ -18,31 +18,29 @@ import org.example.backend.Invoicer;
 @Stateless
 public class ContactFacade {
 
-    @Inject
-    ContactRepository repo;
+    @PersistenceContext
+    EntityManager em;
 
     public List<Contact> findAll(Invoicer invoicer) {
-        return repo.findByInvoicer(invoicer);
+        return em.createQuery("SELECT c FROM Contact c WHERE c.invoicer = :invoicer", Contact.class)
+                .setParameter("invoicer", invoicer).getResultList();
     }
 
     public List<Contact> findPaged(Invoicer invoicer, String filter,
             int firstResult,
             int maxResults) {
-        return repo.findByInvoicerAndNameLikeIgnoreCase(invoicer, filter + "%").
-                firstResult(firstResult).maxResults(maxResults).getResultList();
-    }
-
-    public Integer countContacts(Invoicer invoicer, String filter) {
-        return (int) repo.findByInvoicerAndNameLikeIgnoreCase(invoicer, filter + "%").
-                count();
+        // TODO filter
+        return em.createQuery("SELECT c FROM Contact c WHERE c.invoicer = :invoicer", Contact.class)
+                .setParameter("invoicer", invoicer)
+                .getResultList();
     }
 
     public Contact save(Contact entity) {
-        return repo.save(entity);
+        return em.merge(entity);
     }
     
     public Contact refresh(Contact entity) {
-        return repo.findBy(entity.getId());
+        return em.find(Contact.class, entity.getId());
     }
     
 }

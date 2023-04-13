@@ -17,9 +17,7 @@ import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.mail.util.ByteArrayDataSource;
 
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.MultiPartEmail;
-import org.apache.deltaspike.core.api.config.ConfigProperty;
+//import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.example.backend.Invoice;
 import org.example.backend.InvoiceRow;
 import org.example.backend.Invoicer;
@@ -33,6 +31,23 @@ import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
 import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.annotation.Resource;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.InitialContext;
 
 /**
  *
@@ -41,54 +56,25 @@ import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
 @Stateless
 public class InvoiceFacade {
 
-    @Inject
-    InvoiceRepository repo;
+    @PersistenceContext
+    EntityManager em;
 
-    @Inject
-    InvoicerRepository invoicerRepo;
-
-    @Inject
-    @ConfigProperty(name = "jpa-invoicer.smtp.username")
-    private String smtpUsername;
-    @Inject
-    @ConfigProperty(name = "jpa-invoicer.smtp.password")
-    private String smtpPassword;
-
-    @Inject
-    @ConfigProperty(name = "jpa-invoicer.smtp.hostname")
-    private String smtpHostname;
-
-    @Inject
-    @ConfigProperty(name = "jpa-invoicer.smtp.port")
-    private Integer smtpPort;
-
-    @Inject
-    @ConfigProperty(name = "jpa-invoicer.smtp.from")
-    private String smtpFrom;
-
-    @Inject
-    @ConfigProperty(name = "jpa-invoicer.smtp.subject")
-    private String smtpSubject;
-
-    @Inject
-    @ConfigProperty(name = "jpa-invoicer.smtp.message")
-    private String smtpMessage;
-
-    public List<Invoice> findAll(Invoicer value) {
-        return repo.findAll();
+    public List<Invoice> findAll(Invoicer invoicer) {
+        return em.createQuery("SELECT iv from Invoice iv WHERE iv.invoicer = :invoicer", Invoice.class)
+                .setParameter("invoicer", invoicer)
+                .getResultList();
     }
 
     public Invoice createFor(Invoicer invoicer) {
-        invoicer = invoicerRepo.findBy(invoicer.getId());
+        invoicer = em.find(Invoicer.class, invoicer.getId());
         Invoice invoice = new Invoice();
         invoice.setInvoiceNumber(invoicer.getAndIcrementNextInvoiceNumber());
         invoice.setInvoicer(invoicer);
         invoice.setInvoiceDate(LocalDate.now());
         invoice.setDueDate(LocalDate.now().plusDays(DEFAULT_DUE_DATE_DURATION));
         invoice.setLastEditor(session.getUser());
-        invoicerRepo.save(invoicer);
-        repo.save(invoice);
-        return invoice;
+        em.merge(invoicer);
+        return em.merge(invoice);
     }
 
     @Inject
@@ -96,12 +82,12 @@ public class InvoiceFacade {
 
     public Invoice save(Invoice entity) {
         entity.setLastEditor(session.getUser());
-        return repo.save(entity);
+        return em.merge(entity);
     }
 
     public void writeAsOdt(Invoice invoice, OutputStream out) {
         Locale.setDefault(new Locale("fi"));
-        invoice = repo.findBy(invoice.getId());
+        invoice = em.find(Invoice.class, invoice.getId());
         invoice.getInvoiceRows().size();
         invoice.getInvoicer().getBankAccount();
         invoice.getInvoicer().getBankAccount();
@@ -124,8 +110,8 @@ public class InvoiceFacade {
             ctx.put("to", invoice.getTo());
             ctx.put("r", invoice.getInvoiceRows());
             ctx.
-                    put("sender", invoicerRepo.findBy(invoice.getInvoicer().
-                                    getId()));
+                    put("sender", em.find(Invoice.class, invoice.getInvoicer().
+                            getId()));
 
             // 4) Generate report by merging Java model with the ODT
             report.process(ctx, out);
@@ -135,7 +121,7 @@ public class InvoiceFacade {
     }
 
     protected static InputStream getTemplate(Invoicer invoicer) {
-        if(invoicer.getTemplate() == null) {
+        if (invoicer.getTemplate() == null) {
             return getDefaultTemplate();
         } else {
             return new ByteArrayInputStream(invoicer.getTemplate());
@@ -148,10 +134,10 @@ public class InvoiceFacade {
 
     public void writeAsPdf(Invoice invoice, OutputStream out) {
         Locale.setDefault(new Locale("fi"));
-        invoice = repo.findBy(invoice.getId());
-        
+        invoice = em.find(Invoice.class, invoice.getId());
+
         try {
-            
+
             // Get template stream (either the default or overridden by the user)
             InputStream in = getTemplate(invoice.getInvoicer());
 
@@ -159,7 +145,7 @@ public class InvoiceFacade {
             // Freemarker template engine
             IXDocReport report = XDocReportRegistry.getRegistry().
                     loadReport(in, TemplateEngineKind.Freemarker);
-            
+
             // Define what we want to do (PDF file from ODF template)
             Options options = Options.getTo(ConverterTypeTo.PDF).via(
                     ConverterTypeVia.ODFDOM);
@@ -174,7 +160,7 @@ public class InvoiceFacade {
             FieldsMetadata metadata = report.createFieldsMetadata();
             metadata.load("r", InvoiceRow.class, true);
             ctx.put("r", invoice.getInvoiceRows());
-            
+
             // Write the PDF file to output stream
             report.convert(ctx, options, out);
             out.close();
@@ -184,27 +170,42 @@ public class InvoiceFacade {
     }
 
     public void remove(Invoice invoice) {
-        repo.remove(repo.findBy(invoice.getId()));
+        em.remove(em.find(Invoice.class, invoice.getId()));
     }
 
-    public void sendInvoice(final Invoice invoice) throws EmailException, IOException {
+    public void sendInvoice(final Invoice invoice) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeAsPdf(invoice, out);
-            ByteArrayDataSource dataSource =
-                    new ByteArrayDataSource(out.toByteArray(), "application/pdf");
-            String fileName = "invoice_" + invoice.getInvoiceNumber() + ".pdf";
+            DataSource dataSource
+                    = new ByteArrayDataSource(out.toByteArray(), "application/pdf");
+            
+            InitialContext initialContext= new InitialContext ();
+            // See https://rieckpil.de/howto-send-emails-with-java-ee-using-payara/ how
+            // configure Java mail to this JNDI address, not injecting with Resource to
+            // make testing/demoing possible without smtp server
+            Session mailSession = (Session) initialContext.lookup ("mail/localsmtp");
+            
+            MimeMessage mimeMessage = new MimeMessage(mailSession);
 
-            MultiPartEmail email = new MultiPartEmail();
-            email.setAuthentication(smtpUsername, smtpPassword);
-            email.setHostName(smtpHostname);
-            email.setSmtpPort(smtpPort);
-            email.setFrom(smtpFrom);
-            email.addTo(invoice.getInvoicer().getEmail());
-            email.setSubject(smtpSubject);
-            email.setMsg(smtpMessage);
-            // TODO FIGURE OUT WHAT IS WRONG HERE
-//            email.attach(dataSource, fileName, "Invoice");
-            email.send();
+            mimeMessage.setSubject("Hello World from Java EE!");
+            mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(invoice.getInvoicer().getEmail()));
+
+            MimeMultipart mailContent = new MimeMultipart();
+
+            MimeBodyPart mailMessage = new MimeBodyPart();
+            mailMessage.setContent("<p>Take a look at the attached invoice PDF file</p>", "text/html; charset=utf-8");
+            mailContent.addBodyPart(mailMessage);
+
+            MimeBodyPart mailAttachment = new MimeBodyPart();
+            mailAttachment.setDataHandler(new DataHandler(dataSource));
+            mailAttachment.setFileName("invoice_" + invoice.getInvoiceNumber() + ".pdf");
+
+            mailContent.addBodyPart(mailAttachment);
+            mimeMessage.setContent(mailContent);
+
+            Transport.send(mimeMessage);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 }

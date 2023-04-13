@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
@@ -23,11 +25,8 @@ import org.example.backend.User;
 @Stateless
 public class InvoicerFacade {
 
-    @Inject
-    InvoicerRepository repository;
-
-    @Inject
-    UserRepository userRepository;
+    @PersistenceContext
+    EntityManager em;
 
     public Invoicer save(Invoicer entity) {
         for (int i = 0; i < entity.getAdministrators().size(); i++) {
@@ -35,13 +34,13 @@ public class InvoicerFacade {
             User existing = userFacade.findByEmail(usr.getEmail());
             if (existing != null) {
                 entity.getAdministrators().remove(usr);
-                entity.getAdministrators().add(i, userRepository.findBy(existing.
+                entity.getAdministrators().add(i, em.find(User.class, existing.
                         getId()));
             } else {
-                userRepository.save(usr);
+                em.merge(usr);
             }
         }
-        return repository.save(entity);
+        return em.merge(entity);
     }
 
     @Inject
@@ -61,7 +60,7 @@ public class InvoicerFacade {
     }
 
     public void writeAsXml(Invoicer invoicer, OutputStream out) {
-        invoicer = repository.findBy(invoicer.getId());
+        invoicer = em.find(Invoicer.class, invoicer.getId());
         invoicer.getInvoices().size();
         try {
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
@@ -77,13 +76,15 @@ public class InvoicerFacade {
     }
 
     public Invoicer findJoined(Long id) {
-        Invoicer in = repository.findBy(id);
+        Invoicer in = em.find(Invoicer.class, id);
         in.getAdministrators().size(); // init lazy relation
         in.getProducts().size();
         return in;
     }
 
     public List<Invoicer> findFor(User user) {
-        return repository.findFor(user);
+        return em.createQuery("SELECT iv FROM Invoicer iv JOIN FETCH iv.administrators a WHERE a = ?1", Invoicer.class)
+                .setParameter(1, user)
+                .getResultList();
     }
 }

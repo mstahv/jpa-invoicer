@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.URL;
 import jakarta.inject.Inject;
 
-import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.example.backend.UserSession;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.model.OAuthRequest;
@@ -120,12 +119,8 @@ public class LoginView extends VVerticalLayout implements RequestHandler {
         return false;
     }
 
-    @Inject
-    @ConfigProperty(name = "jpa-invoicer.gappkey")
-    private String googleAppkey;
+    private final String googleAppkey = System.getenv("JPA_INVOICER_GAPPKEY");
 
-    @Inject
-    @ConfigProperty(name = "jpa-invoicer.gappsecret")
-    private String googleAppSecret;
+    private final String googleAppSecret = System.getenv("JPA_INVOICER_GAPPSECRET");
 
 }

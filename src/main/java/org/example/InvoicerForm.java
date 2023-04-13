@@ -1,6 +1,7 @@
 package org.example;
 
 import com.vaadin.cdi.annotation.RouteScoped;
+import com.vaadin.cdi.annotation.UIScoped;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -14,7 +15,6 @@ import org.vaadin.firitin.fields.ByteArrayUploadField;
 import org.vaadin.firitin.fields.ElementCollectionField;
 import org.vaadin.firitin.form.AbstractForm;
 
-@RouteScoped
 public class InvoicerForm extends AbstractForm<Invoicer> {
 
     TextField name = new VTextField("name");

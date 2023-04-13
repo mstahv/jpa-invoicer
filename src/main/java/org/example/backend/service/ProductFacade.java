@@ -8,6 +8,8 @@ package org.example.backend.service;
 import java.util.List;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.example.backend.Invoicer;
 import org.example.backend.Product;
 import org.example.backend.Product.State;
@@ -18,19 +20,25 @@ import org.example.backend.Product.State;
  */
 @Stateless
 public class ProductFacade {
-    
-    @Inject ProductRepository repo;
 
+    @PersistenceContext
+    EntityManager em;
+    
     public void save(Product entity) {
-        repo.save(entity);
+        em.merge(entity);
     }
 
-    public List<Product> findByInvoicer(Invoicer value) {
-        return repo.findByInvoicer(value);
+    public List<Product> findByInvoicer(Invoicer invoicer) {
+        return em.createQuery("SELECT p FROM Product p WHERE p.invoicer = :invoicer", Product.class)
+                .setParameter("invoicer", invoicer)
+                .getResultList();
     }
 
     public  List<Product> findActiveByInvoicer(Invoicer invoicer) {
-        return repo.findByInvoicerAndProductState(invoicer, State.Active);
+        return em.createQuery("SELECT p FROM Product p WHERE p.productState = :state AND p.invoicer = :invoicer", Product.class)
+                .setParameter("state", State.Active)
+                .setParameter("invoicer", invoicer)
+                .getResultList();
     }
        
 }

@@ -11,7 +11,6 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinSession;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.deltaspike.core.api.config.ConfigResolver;
 import org.example.auth.LoginView;
 import org.example.backend.service.InvoicerFacade;
 import org.example.backend.service.ProductFacade;
@@ -38,8 +37,7 @@ public class UserSession implements Serializable {
 
     @PostConstruct
     public void init() {
-        final String propertyValue = ConfigResolver.getPropertyValue(
-                "jpa-invoicer.gappkey");
+        final String propertyValue = System.getenv("JPA_INVOICER_GAPPKEY");
         // If no Google OAuth API key available, use fake login
         if (StringUtils.isEmpty(propertyValue)) {
             demoLogin();

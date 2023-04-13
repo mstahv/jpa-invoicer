@@ -1,7 +1,9 @@
 package org.example;
 
+import com.vaadin.cdi.annotation.CdiComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.Route;
 import org.example.backend.Product;
@@ -19,18 +21,19 @@ import jakarta.inject.Inject;
  * @author Mortoza Khan
  */
 @Route(layout = MainLayout.class)
-@MenuItem(title = "Products", order = MenuItem.END)
+@MenuItem(title = "Products", order = MenuItem.END, icon = VaadinIcon.CART)
+@CdiComponent
 public class ProductView extends VVerticalLayout {
 
     @Inject
     ProductFacade facade;
+
     @Inject
     ProductForm form;
 
     @Inject
     InvoicerSelect invoicerSelect;
 
-    // TODO PrimaryButon
     Button newButton = new Button("New", e -> {
         Product p = new Product();
         p.setInvoicer(invoicerSelect.getValue());
@@ -49,8 +52,7 @@ public class ProductView extends VVerticalLayout {
         form.setResetHandler(this::reset);
         form.setSavedHandler(this::save);
 
-        table.setWidth("400px");
-        //table.setColumnCollapsingAllowed(true);
+        table.setWidthFull();
         
         table.asSingleSelect().addValueChangeListener(e -> {
             form.setEntity(e.getValue());

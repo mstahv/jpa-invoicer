@@ -2,6 +2,8 @@ package org.example.backend.service;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import org.example.backend.Invoicer;
 import org.example.backend.User;
@@ -14,13 +16,15 @@ import java.util.List;
  */
 @Stateless
 public class UserFacade {
-    
-    @Inject
-    UserRepository repo;
 
+    @PersistenceContext
+    EntityManager em;
+    
     public User findByEmail(String email) {
         try {
-            User user = repo.findByEmail(email);
+            User user = em.createQuery("Select u FROM User u where u.email = :email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
             System.out.println(user.getAdministrates());
             user.getAdministrates().size();
             return user;
@@ -30,7 +34,7 @@ public class UserFacade {
     }
 
     public User save(User user) {
-        return repo.save(user);
+        return em.merge(user);
     }
 
 }

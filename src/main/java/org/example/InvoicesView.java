@@ -1,11 +1,11 @@
 package org.example;
 
+import com.vaadin.cdi.annotation.CdiComponent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.Route;
-import org.apache.commons.mail.EmailException;
 import org.example.backend.Invoice;
 import org.example.backend.UserSession;
 import org.example.backend.service.InvoiceFacade;
@@ -25,6 +25,7 @@ import java.io.IOException;
 
 @Route(layout = MainLayout.class)
 @MenuItem(order = MenuItem.END)
+@CdiComponent
 public class InvoicesView extends VVerticalLayout {
 
     @Inject
@@ -46,20 +47,15 @@ public class InvoicesView extends VVerticalLayout {
             .withFullWidth()
             .withProperties("invoiceNumber", "to", "invoiceDate", "lastEdited",
                     "lastEditor");
-            //.withColumnHeaders("Nr", "To", "Date", "Last edited", "Edited by")
 
-    DynamicFileDownloader backup = new DynamicFileDownloader("Download backup","backup.xml",
+    DynamicFileDownloader backup = new DynamicFileDownloader("Download backup", "backup.xml",
             out -> invoicerFacade.writeAsXml(sender.getValue(), out)
     );
 
     @PostConstruct
     public void initComponent() {
         table.addComponentColumn(this::getInvoiceActions).setHeader("actions");
-        table.getColumnByKey("invoiceNumber").setWidth("110px").setFlexGrow(0);
-        table.getColumnByKey("invoiceDate").setWidth("110px").setFlexGrow(0);
-        table.getColumnByKey("lastEdited").setWidth("110px").setFlexGrow(0);
-        table.getColumnByKey("lastEditor").setWidth("110px").setFlexGrow(0);
-        table.getColumns().forEach(c -> c.setResizable(true));
+        table.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
 
         if (session.getUser().getAdministrates().isEmpty()) {
             Notification.show("Add invoicer first!");
@@ -89,7 +85,7 @@ public class InvoicesView extends VVerticalLayout {
 
         add(
                 new VHorizontalLayout(addButton, sender).space().withComponents(backup)
-                    .alignAll(Alignment.CENTER)
+                        .alignAll(Alignment.CENTER)
         );
         addAndExpand(table);
     }
@@ -104,15 +100,13 @@ public class InvoicesView extends VVerticalLayout {
         final VHorizontalLayout actions = new VHorizontalLayout();
         if (invoice.getInvoicer() != null) {
             final DynamicFileDownloader odtDownload = new DynamicFileDownloader(" odt", "invoice_" + invoice.getInvoiceNumber() + ".odt",
-                    out -> facade.writeAsOdt(invoice, out))
-                    // .withIcon(VaadinIcon.FILE_TEXT_O.create())
+                    out -> facade.writeAsOdt(invoice, out)) // .withIcon(VaadinIcon.FILE_TEXT_O.create())
                     //.withStyleName(ValoTheme.BUTTON_ICON_ONLY)
                     ;
             odtDownload.addComponentAsFirst(VaadinIcon.DOWNLOAD.create());
 
-            final DynamicFileDownloader pdfDownload = new DynamicFileDownloader(" pdf","invoice_" + invoice.getInvoiceNumber() + ".pdf",
-                    out -> facade.writeAsPdf(invoice, out))
-                    ;
+            final DynamicFileDownloader pdfDownload = new DynamicFileDownloader(" pdf", "invoice_" + invoice.getInvoiceNumber() + ".pdf",
+                    out -> facade.writeAsPdf(invoice, out));
             pdfDownload.addComponentAsFirst(VaadinIcon.DOWNLOAD_ALT.create());
 
             final VButton sendInvoice = new VButton()
@@ -124,7 +118,7 @@ public class InvoicesView extends VVerticalLayout {
         }
 
         final ConfirmButton deleteButton = new DeleteButton()
-                .withConfirmHandler( () -> {
+                .withConfirmHandler(() -> {
                     facade.remove(invoice);
                     listEntities();
                 })
@@ -151,15 +145,8 @@ public class InvoicesView extends VVerticalLayout {
     }
 
     private void sendInvoiceClicked(final Invoice invoice) {
-        try {
-            facade.sendInvoice(invoice);
-            Notification.show("Invoice sent");
-        } catch (EmailException | IOException e) {
-            e.printStackTrace();
-            Notification.show("Error sending the invoice"
-                    // TODO , Notification.Type.ERROR_MESSAGE
-            );
-        }
+        facade.sendInvoice(invoice);
+        Notification.show("Invoice sent");
     }
 
 }
