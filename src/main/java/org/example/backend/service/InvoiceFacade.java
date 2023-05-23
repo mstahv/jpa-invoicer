@@ -199,4 +199,8 @@ public class InvoiceFacade {
             throw new RuntimeException(ex);
         }
     }
+
+    public void persist(Invoice invoice) {
+        em.persist(invoice);
+    }
 }

@@ -1,15 +1,13 @@
 package org.example.backend;
 
+import jakarta.persistence.CascadeType;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlTransient;
@@ -24,7 +22,7 @@ public class Invoice extends AbstractEntity {
     @NotNull
     private Integer invoiceNumber;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Contact to;
 
     @ManyToOne

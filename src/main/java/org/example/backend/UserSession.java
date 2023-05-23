@@ -9,7 +9,10 @@ import jakarta.inject.Inject;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinSession;
+import java.time.LocalDate;
 import org.apache.commons.lang3.StringUtils;
+import static org.example.InvoicesView.DEFAULT_DUE_DATE_DURATION;
+import org.example.backend.service.InvoiceFacade;
 import org.example.backend.service.InvoicerFacade;
 import org.example.backend.service.ProductFacade;
 import org.example.backend.service.UserFacade;
@@ -30,6 +33,9 @@ public class UserSession implements Serializable {
     @Inject
     ProductFacade productFacade;
 
+    @Inject
+    InvoiceFacade invoiceFacade;
+    
     private User user;
     private String image;
 
@@ -43,13 +49,13 @@ public class UserSession implements Serializable {
     }
 
     protected void demoLogin() {
-        final String email = "matti.meikalainen@gmail.com";
+        final String email = "info@vacuumandsuck.com";
         this.user = userFacade.findByEmail(email);
         if (user == null) {
             this.user = userFacade.save(new User(email));
 
             Invoicer invoicer = new Invoicer();
-            invoicer.setName("Matin pummpu ja imu");
+            invoicer.setName("Vacuum & Suck Ltd");
             invoicer.setAddress("Ruukinkatu 4, 20100 Turku");
             invoicer.setBankAccount("FI1234567890");
             invoicer.setEmail("matti@pumppu.fi");
@@ -62,18 +68,39 @@ public class UserSession implements Serializable {
             }
 
             this.user.getAdministrates().add(invoicer);
+            Integer nextInvoiceNumber = invoicer.getAndIcrementNextInvoiceNumber();
+            
             invoicer = invoicerFacade.save(invoicer);
             Product product = new Product();
-            product.setName("Pumppu");
+            product.setName("Pump");
             product.setPrice(30.0);
             product.setInvoicer(invoicer);
             productFacade.save(product);
             product = new Product();
-            product.setName("Imuri");
+            product.setName("Hoover");
             product.setPrice(60.0);
             product.setInvoicer(invoicer);
-            productFacade.save(product);
-
+            product = productFacade.save(product);
+            
+            Invoice invoice = new Invoice();
+            invoice.setInvoiceNumber(nextInvoiceNumber);
+            invoice.setInvoicer(invoicer);
+            invoice.setInvoiceDate(LocalDate.now());
+            invoice.setDueDate(LocalDate.now().plusDays(DEFAULT_DUE_DATE_DURATION));
+            invoice.setLastEditor(user);
+        
+            invoice.setDueDate(LocalDate.now().plusDays(14));
+            Contact c = new Contact("carl@customer.com", "Carl Customer");
+            c.setInvoicer(invoicer);
+            invoice.setTo(c);
+            InvoiceRow invoiceRow = new InvoiceRow();
+            invoiceRow.setDescription("New model!");
+            invoiceRow.setProduct(product);
+            invoiceRow.setPrice(product.getPrice());
+            invoiceRow.setQuantity(1.0);
+            invoiceRow.setUnit("pcs");
+            invoice.getInvoiceRows().add(invoiceRow);
+            invoiceFacade.save(invoice);
         }
     }
 

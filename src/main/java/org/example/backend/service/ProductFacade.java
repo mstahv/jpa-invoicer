@@ -18,8 +18,8 @@ public class ProductFacade {
     @PersistenceContext
     EntityManager em;
     
-    public void save(Product entity) {
-        em.merge(entity);
+    public Product save(Product entity) {
+        return em.merge(entity);
     }
 
     public List<Product> findByInvoicer(Invoicer invoicer) {
