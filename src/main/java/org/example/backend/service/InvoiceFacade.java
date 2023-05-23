@@ -4,12 +4,9 @@ import static org.example.InvoicesView.DEFAULT_DUE_DATE_DURATION;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -17,7 +14,6 @@ import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.mail.util.ByteArrayDataSource;
 
-//import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.example.backend.Invoice;
 import org.example.backend.InvoiceRow;
 import org.example.backend.Invoicer;
@@ -33,20 +29,15 @@ import fr.opensagres.xdocreport.template.TemplateEngineKind;
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
-import jakarta.annotation.Resource;
 import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
-import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.InitialContext;
 
 /**

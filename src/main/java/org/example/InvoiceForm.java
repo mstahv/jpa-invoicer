@@ -15,7 +15,6 @@ import org.example.backend.service.ProductFacade;
 import org.vaadin.firitin.components.combobox.VComboBox;
 import org.vaadin.firitin.components.orderedlayout.VHorizontalLayout;
 import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
-import org.vaadin.firitin.components.textfield.VIntegerField;
 import org.vaadin.firitin.components.textfield.VNumberField;
 import org.vaadin.firitin.components.textfield.VTextField;
 import org.vaadin.firitin.fields.ElementCollectionField;
@@ -40,6 +39,7 @@ public class InvoiceForm extends AbstractForm<Invoice> {
         super(Invoice.class);
     }
 
+    // Used by ElementCollectionField from the Viritin add-on
     public static final class RowEditor {
         VComboBox<Product> product = new VComboBox<Product>()
                 .withWidth("150px")

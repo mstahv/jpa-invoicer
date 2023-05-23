@@ -21,7 +21,6 @@ import org.vaadin.firitin.components.orderedlayout.VVerticalLayout;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
-import java.io.IOException;
 
 @Route(layout = MainLayout.class)
 @MenuItem(order = MenuItem.END)

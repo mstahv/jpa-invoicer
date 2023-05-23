@@ -1,14 +1,11 @@
 package org.example.backend.service;
 
 import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-import org.example.backend.Invoicer;
 import org.example.backend.User;
 
-import java.util.List;
 
 /**
  *

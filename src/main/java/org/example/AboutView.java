@@ -1,4 +1,3 @@
-
 package org.example;
 
 import com.vaadin.cdi.annotation.CdiComponent;

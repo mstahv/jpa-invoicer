@@ -1,7 +1,6 @@
 package org.example;
 
 import com.vaadin.cdi.annotation.RouteScoped;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -68,7 +67,6 @@ public class ContactSelector extends Composite<HorizontalLayout> implements HasV
          */
     }
 
-//    @Override
     public void addNewItem(String newItemCaption) {
         // make contact with detail
         Contact contact = new Contact();

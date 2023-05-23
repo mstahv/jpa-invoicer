@@ -1,6 +1,5 @@
 package org.example;
 
-import com.vaadin.cdi.annotation.RouteScopeOwner;
 import com.vaadin.cdi.annotation.RouteScoped;
 import com.vaadin.flow.component.select.Select;
 import jakarta.annotation.PostConstruct;

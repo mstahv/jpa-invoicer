@@ -1,10 +1,7 @@
 package org.example;
 
-import com.vaadin.cdi.annotation.RouteScoped;
-import com.vaadin.cdi.annotation.UIScoped;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import org.example.backend.Invoicer;
 import org.example.backend.User;
